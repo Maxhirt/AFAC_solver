@@ -1,0 +1,24 @@
+[project]
+name = "afac-solver"
+version = "0.1.0"
+description = "Python Envrionment for plotting and formatting."
+authors = [
+    {name = "Max Hirtenlehner",email = "max.hirtenlehner@student.uibk.ac.at"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+package-mode = false
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+package-mode = false
+
+[dependency-groups]
+dev = [
+    "fprettify (>=0.3.7,<0.4.0)",
+    "fortitude-lint (>=0.9.0,<0.10.0)",
+    "fortls (>=3.2.2,<4.0.0)",
+    "pre-commit (>=4.6.0,<5.0.0)"
+]

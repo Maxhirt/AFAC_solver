@@ -1,0 +1,16 @@
+repos:
+  - repo: local
+    hooks:
+      - id: fprettify
+        name: fprettify
+        entry: poetry run fprettify
+        language: system
+        files: \.(f|f90|f95|f03|f08|F|F90|F95|F03|F08)$
+        args: ["--indent", "4", "--whitespace", "2"]
+
+      - id: fortitude
+        name: fortitude
+        entry: poetry run fortitude check
+        language: system
+        files: \.(f|f90|f95|f03|f08|F|F90|F95|F03|F08)$
+        args: ["--fix", "--ignore", "S"]

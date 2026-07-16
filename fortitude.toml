@@ -1,0 +1,4 @@
+[check]
+# Ignore specific rules if needed, though default fortitude is highly Coarray-safe
+ignore = ["C001"]
+line-length = 120
