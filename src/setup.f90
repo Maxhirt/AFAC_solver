@@ -4,10 +4,14 @@ module setup
 
     public :: pi, fourpi, NSLAE, global_domain_length, multigrid_levels, rsp_sphere, rho_sphere, rsp1, &
               rho1, rsp2, rho2, offset_x1, offset_x2, x, b, res, err, &
-              rho, bitmask, analytical_solution, domain_length, hloc, grid
+              rho, bitmask, analytical_solution, domain_length, hloc, grid, G, boundary_type, semi_x, &
+              semi_z, restricted_interface, restricted_interface_buffer, coarse_cell_buffer, &
+              restricted_interface_buffer_recv
 
     double precision, PARAMETER :: pi = 3.14159265358973238462d0
     double precision, PARAMETER :: fourpi = 4*pi
+    integer, PARAMETER :: boundary_type = 0
+    double precision, PARAMETER :: G = 1.d0
 
 #ifndef GRID_N
 #define GRID_N 64
@@ -27,6 +31,8 @@ module setup
     double precision, PARAMETER :: rho2 = 1.d0
     double precision, PARAMETER :: offset_x1 = 1.d0
     double precision, PARAMETER :: offset_x2 = 1.d0
+    double precision, PARAMETER :: semi_x = 1.d0
+    double precision, PARAMETER :: semi_z = 0.5d0
 
     ! Arrays
     double precision :: x(N + 2, N + 2, N + 2)
@@ -55,5 +61,13 @@ module setup
     end type grid_level
 
     type(grid_level), Allocatable :: grid(:)
+
+    ! communication variables
+    double precision :: restricted_interface((N + 2), (N + 2), (N + 2), 6)
+    DOUBLE PRECISION :: restricted_interface_buffer(6*(N/2)*(N/2)) [*]
+    DOUBLE PRECISION :: coarse_cell_buffer(6*(N/2 + 2)*(N/2 + 2)) [*]
+    double precision :: restricted_interface_buffer_recv(6*(N/2)*(N/2))
+    double precision :: coarse_comp_x(N, N, N)
+    DOUBLE PRECISION :: coarse_cell_buffer_recv(6*(N/2 + 2)*(N/2 + 2))
 
 end module setup
