@@ -1,8 +1,10 @@
 module communication
     use setup, only: x, b, err, res, N, restricted_interface, restricted_interface_buffer, &
-                     coarse_cell_buffer, restricted_interface_buffer_recv, coarse_comp_x, coarse_cell_buffer_recv
+                     coarse_cell_buffer, restricted_interface_buffer_recv, coarse_comp_x, coarse_cell_buffer_recv, &
+                     error_buffer, error_buffer_recv, error_copy
     implicit none(type, external)
     PRIVATE
+    public :: interface_exchange, pack_error, unpack_error
 
 contains
 
@@ -390,5 +392,54 @@ contains
             end do
         end do
     end subroutine unpack_coarse
+
+    !> Packs the error into a 1D array
+    !!
+    !! Packs the error for transfer to a finer grid of the center part covered by a finer grid.
+    subroutine pack_error()
+        implicit none(type, external)
+        integer :: i, k, l, idx, N_start, N_end, L_size
+
+        N_start = N/4 + 1
+        N_end = 3*N/4 + 2
+        L_size = N_end - N_start + 1
+        !$OMP parallel do collapse(3) private(l,k,i,idx)
+        do l = N_start, N_end
+            do k = N_start, N_end
+                do i = N_start, N_end
+                    idx = 1 + (i - N_start) + &
+                          (k - N_start)*L_size + &
+                          (l - N_start)*L_size*L_size
+                    error_buffer(idx) = err(i, k, l)
+                end do
+            end do
+        end do
+        !$OMP end parallel do
+    end subroutine pack_error
+
+    !> Unpacks the error from the coarser grid.
+    !!
+    !! Unpacks the error from the coarse grid packaged as a 1D array.
+    !! This is done via a parallelized indexing.
+    subroutine unpack_error()
+        implicit none(type, external)
+        integer :: i, k, l, idx, N_start, N_end_L_size
+
+        N_start = N/4 + 1
+        N_end = 3*N/4 + 2
+        L_size = N_end - N_start + 1
+        !$OMP parallel do collapse(3) private(l,k,i,index_zero,idx)
+        do l = N_start, N_end
+            do k = N_start, N_end
+                do i = N_start, N_end
+                    idx = 1 + (i - N_start) + &
+                          (k - N_start)*L_size + &
+                          (l - N_start)*L_size*L_size
+                    err_copy(i, k, l) = error_buffer_recv(idx)
+                end do
+            end do
+        end do
+        !$OMP end parallel do
+    end subroutine unpack_error
 
 end module communication

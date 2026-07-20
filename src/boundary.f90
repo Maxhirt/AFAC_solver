@@ -65,7 +65,8 @@ contains
         case (3) ! homogenous ellipsoid
 
             if (radius**2/semi_x**2 + zpos**2/semi_z**2 <= 1.d0) then
-                boundary_value = -pi*G*rho0*(semi_x**2*AA1 + semi_x**2*AA1 + semi_z**2*AA3 - AA1*radius**2 - AA3*zpos**2)
+                boundary_value = -pi*G*rho0*(semi_x**2*AA1 + semi_x**2*AA1 + &
+                                             semi_z**2*AA3 - AA1*radius**2 - AA3*zpos**2)
             else
 
                 prom1 = radius**2 + zpos**2 - semi_x**2 - semi_z**2
@@ -79,7 +80,8 @@ contains
                 sqroot = sqrt(semi_z**2 + lambda)
 
                 boundary_value = -pi*G*rho0*semi_x**2*semi_z*((1.d0 + radius**2/(2.d0*(semi_z**2 - semi_x**2)) - &
-                           zpos**2/(semi_z**2 - semi_x**2))*I1 - radius**2*sqroot/((semi_z**2 - semi_x**2)*(semi_x**2 + lambda)) - &
+                                                               zpos**2/(semi_z**2 - semi_x**2))*I1 - &
+                                                              radius**2*sqroot/((semi_z**2 - semi_x**2)*(semi_x**2 + lambda)) - &
                                                               zpos**2*(2.d0/((semi_x**2 + lambda)*sqroot) - &
                                                                        2.d0*sqroot/((semi_z**2 - semi_x**2)*(semi_x**2 + lambda))))
 
@@ -96,9 +98,6 @@ contains
     !!
     !! Sets the inital values for x and b as well as setting
     !! the boundary values for the outermost level.
-    !!
-    !! @param[in] param1 Description of param1.
-    !! @param[out] param2 Description of param2.
     subroutine init_boundary()
 
         integer :: i, k, l

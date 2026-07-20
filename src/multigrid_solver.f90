@@ -7,7 +7,8 @@ contains
     !> Red-Black Gauss-Seidel solver for each Multigrid level
     !!
     !! Runs the Red-Black Gauss-Seidel solver for each Multigrid level using the level as an input. The solver
-    !! iteratively solves for the unknowns on a grid, alternating between red and black points, it runs a fixed amount of times.
+    !! iteratively solves for the unknowns on a grid, alternating between red
+    !! and black points, it runs a fixed amount of times.
     !!
     !! @param[in] grid The Multigrid level to solve on.
     subroutine rbgs_smoother(grid)

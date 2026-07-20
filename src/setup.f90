@@ -6,7 +6,7 @@ module setup
               rho1, rsp2, rho2, offset_x1, offset_x2, x, b, res, err, &
               rho, bitmask, analytical_solution, domain_length, hloc, grid, G, boundary_type, semi_x, &
               semi_z, restricted_interface, restricted_interface_buffer, coarse_cell_buffer, &
-              restricted_interface_buffer_recv
+              restricted_interface_buffer_recv, error_copy, error_buffer, error_buffer_recv
 
     double precision, PARAMETER :: pi = 3.14159265358973238462d0
     double precision, PARAMETER :: fourpi = 4*pi
@@ -67,7 +67,10 @@ module setup
     DOUBLE PRECISION :: restricted_interface_buffer(6*(N/2)*(N/2)) [*]
     DOUBLE PRECISION :: coarse_cell_buffer(6*(N/2 + 2)*(N/2 + 2)) [*]
     double precision :: restricted_interface_buffer_recv(6*(N/2)*(N/2))
-    double precision :: coarse_comp_x(N, N, N)
+    double precision :: coarse_comp_x(N + 2, N + 2, N + 2)
     DOUBLE PRECISION :: coarse_cell_buffer_recv(6*(N/2 + 2)*(N/2 + 2))
+    double precision :: err_copy(N/4 + 1:3*N/4 + 2, N/4 + 1:3*N/4 + 2, N/4 + 1:3*N/4 + 2)
+    double precision :: error_buffer((N/2 + 2)*(N/2 + 2)*(N/2 + 2)) [*]
+    double precision :: error_buffer_recv((N/2 + 2)*(N/2 + 2)*(N/2 + 2))
 
 end module setup
