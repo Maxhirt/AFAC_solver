@@ -8,7 +8,7 @@ module boundary
     implicit none(type, external)
 
     private
-    public :: set_boundary
+    public :: init_boundary
 
 contains
 
@@ -54,8 +54,9 @@ contains
             if (radius <= 1.d-12) then
                 boundary_value = 0.d0
             else if (radius <= rsp_sphere) then
-                boundary_value = fourpi*G*rho0_sphere*r_c**2*(atan(radius/r_c)/(radius/r_c) + log((1.d0 + &
-                                                                         (radius/r_c)**2)/(1.d0 + (rsp_sphere/r_c)**2))/2.d0 - 1.d0)
+                boundary_value = fourpi*G*rho0_sphere*r_c**2* &
+                                 (atan(radius/r_c)/(radius/r_c) + log((1.d0 + &
+                                                                       (radius/r_c)**2)/(1.d0 + (rsp_sphere/r_c)**2))/2.d0 - 1.d0)
 
             else
                 boundary_value = -fourpi*G*rho0_sphere*r_c**3*(rsp_sphere/r_c - atan(rsp_sphere/r_c))/radius

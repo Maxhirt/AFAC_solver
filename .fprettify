@@ -1,0 +1,3 @@
+# .fprettify
+line-length = 180
+auto-split = true

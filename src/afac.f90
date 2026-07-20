@@ -1,8 +1,9 @@
 module afac
     use setup, only: N, x, b, domain_length_global, domain_length
-    use setup, only: hloc, centerloc_grid
-    use boundary, only: set_boundary
+    use setup, only: hloc, centerloc_grid, grid
+    use boundary, only: init_boundary
     use communication, only: interface_exchange, pack_error, unpack_error
+    use multigrid_solver, only: rbgs_smoother, multigrid_setup, copy_afac_to_multigrid, copy_multigrid_to_afac, restriction_operator, prolongation_operator, multigrid_residual
     implicit none(type, external)
 
     private
@@ -24,7 +25,7 @@ contains
         hloc = h/(2.d0**(THIS_IMAGE() - 1))
         centerloc_grid = (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0
 
-        call set_boundary()
+        call init_boundary()
 
     end subroutine setup_afac
 
@@ -322,6 +323,26 @@ contains
     !! @param[out] param2 Description of param2.
     subroutine multigrid_afac()
         implicit none(type, external)
+        integer :: runs, i
+        runs = 0
+        call setup_multigrid(grid)
+
+        do while (runs < multigrid_max_iterations)
+            call rbgs_smoother(grid(1))
+            call multigrid_residual(grid(1))
+            do i = 2, multigrid_levels
+                call restriction_operator(i - 1)
+                call rbgs_smoother(grid(i))
+                call multigrid_residual(grid(i))
+            end do
+
+            do i = (multigrid_levels - 1), 1, -1
+                call prolongation_operator(i + 1)
+                call rbgs_smoother(grid(i))
+                call multigrid_residual(grid(i))
+            end do
+            runs = runs + 1
+        end do
 
     end subroutine multigrid_afac
 

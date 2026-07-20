@@ -4,9 +4,9 @@ module setup
 
     public :: pi, fourpi, NSLAE, global_domain_length, multigrid_levels, rsp_sphere, rho_sphere, rsp1, &
               rho1, rsp2, rho2, offset_x1, offset_x2, x, b, res, err, &
-              rho, bitmask, analytical_solution, domain_length, hloc, grid, G, boundary_type, semi_x, &
+              rho, bitmask, ana_solution, domain_length, hloc, grid, G, boundary_type, semi_x, &
               semi_z, restricted_interface, restricted_interface_buffer, coarse_cell_buffer, &
-              restricted_interface_buffer_recv, error_copy, error_buffer, error_buffer_recv
+              restricted_interface_buffer_recv, error_copy, error_buffer, error_buffer_recv, relative_error
 
     double precision, PARAMETER :: pi = 3.14159265358973238462d0
     double precision, PARAMETER :: fourpi = 4*pi
@@ -21,6 +21,8 @@ module setup
     integer, PARAMETER :: NSLAE = (N + 2)*(N + 2)*(N + 2)
     integer, PARAMETER :: global_domain_length = 1.d0
     integer, PARAMETER :: multigrid_levels = 3
+    integer, PARAMETER :: multigrid_max_iterations = 10
+    integer, PARAMETER :: rbgs_max_iterations = 5
 
     ! Constants
     double precision, PARAMETER :: rsp_sphere = 0.25d0
@@ -41,7 +43,8 @@ module setup
     double precision :: err(N + 2, N + 2, N + 2)
     double precision :: rho(N + 2, N + 2, N + 2)
     integer :: bitmask(N + 2, N + 2, N + 2)
-    double precision :: analytical_solution(N + 2, N + 2, N + 2)
+    double precision :: ana_solution(N + 2, N + 2, N + 2)
+    double precision :: relative_error(N + 2, N + 2, N + 2)
 
     ! descriptive variables
     double precision :: domain_length
@@ -57,7 +60,6 @@ module setup
         double precision, Allocatable :: b(:, :, :)
         integer :: N_grid
         double precision :: holc_grid
-        double precision :: centerloc_grid
     end type grid_level
 
     type(grid_level), Allocatable :: grid(:)
