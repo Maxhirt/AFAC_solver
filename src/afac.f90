@@ -7,7 +7,7 @@ module afac
     implicit none(type, external)
 
     private
-    public :: setup_afac
+    public :: setup_afac, error_projection, residual, l2_norm_residual, multigrid_afac
 
 contains
     !> Handles grid setup and boundary condition.
@@ -26,6 +26,9 @@ contains
         centerloc_grid = (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0
 
         call init_boundary()
+
+        err = 0.d0
+        res = 0.d0
 
     end subroutine setup_afac
 
@@ -326,6 +329,7 @@ contains
         integer :: runs, i
         runs = 0
         call setup_multigrid(grid)
+        call copy_afac_to_multigrid
 
         do while (runs < multigrid_max_iterations)
             call rbgs_smoother(grid(1))
@@ -343,6 +347,7 @@ contains
             end do
             runs = runs + 1
         end do
+        call copy_multigrid_to_afac
 
     end subroutine multigrid_afac
 

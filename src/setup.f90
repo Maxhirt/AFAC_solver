@@ -6,12 +6,13 @@ module setup
               rho1, rsp2, rho2, offset_x1, offset_x2, x, b, res, err, &
               rho, bitmask, ana_solution, domain_length, hloc, grid, G, boundary_type, semi_x, &
               semi_z, restricted_interface, restricted_interface_buffer, coarse_cell_buffer, &
-              restricted_interface_buffer_recv, error_copy, error_buffer, error_buffer_recv, relative_error
+              restricted_interface_buffer_recv, error_copy, error_buffer, error_buffer_recv, relative_error, epsilon
 
     double precision, PARAMETER :: pi = 3.14159265358973238462d0
     double precision, PARAMETER :: fourpi = 4*pi
     integer, PARAMETER :: boundary_type = 0
     double precision, PARAMETER :: G = 1.d0
+    double precision, PARAMETER :: epsilon = 1.d-10
 
 #ifndef GRID_N
 #define GRID_N 64
@@ -23,6 +24,7 @@ module setup
     integer, PARAMETER :: multigrid_levels = 3
     integer, PARAMETER :: multigrid_max_iterations = 10
     integer, PARAMETER :: rbgs_max_iterations = 5
+    integer, PARAMETER :: max_iterations = 40
 
     ! Constants
     double precision, PARAMETER :: rsp_sphere = 0.25d0
