@@ -374,7 +374,7 @@ contains
             call pack_error()
         end if
         if (THIS_IMAGE() == i) then
-            error_buffer_recv = error_buffer[THIS_IMAGE() - 1] (:)
+            error_buffer_recv(:) = error_buffer[THIS_IMAGE() - 1] (:)
             call unpack_error()
             call prolongate_error()
         end if
@@ -432,11 +432,16 @@ contains
     !! @param[out] param2 Description of param2.
     subroutine error_reconciliation()
         implicit none(type, external)
-        integer :: i, k, l
+        integer :: i, k, l, mid_start, mid_end
+        mid_start = (N/4) + 2
+        mid_end = (3*N/4) + 1
         !$OMP parallel do collapse(3) private(i,k,l) schedule(static)
         do l = 2, N + 1
         do k = 2, N + 1
         do i = 2, N + 1
+            if ((i >= mid_start .and. i <= mid_end) .and. &
+                (l >= mid_start .and. l <= mid_end) .and. &
+                (k >= mid_start .and. k <= mid_end)) cycle
             x(i, k, l) = x(i, k, l) + err(i, k, l)
         end do
         end do

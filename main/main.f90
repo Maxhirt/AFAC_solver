@@ -27,11 +27,9 @@ program main
         call error_projection
 
         call residual()
-        if (num_runs > 10) then
-            if (mod(num_runs, 2) /= 0) then
-                call l2_norm_residual(l2_norm)
-            end if
-        end if
+
+        call l2_norm_residual(l2_norm)
+
         if (THIS_IMAGE() == 1) then
             print *, "l2_error:  ", l2_norm
         end if
