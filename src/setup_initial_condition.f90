@@ -3,6 +3,7 @@ module setup_initial_condition
                      rho1, rsp2, rho2, offset_x1, offset_x2, semi_x, semi_z
     implicit none(type, external)
     private
+    public :: initial_condition
 
 contains
 
@@ -11,7 +12,8 @@ contains
     !! Sets the density according to the problem setup.
     subroutine initial_condition()
         implicit none(type, external)
-        double precision :: xpos, ypos, zpos, radius
+        double precision :: xpos, ypos, zpos, radius, radius1, radius2
+        integer :: i, k, l
 
         select case (boundary_type)
         case (0)

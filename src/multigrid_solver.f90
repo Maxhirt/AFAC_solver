@@ -1,9 +1,10 @@
 module multigrid_solver
-    use setup, only: grid_level, x, b
+    use setup, only: grid, x, b, res, err, grid_level, multigrid_levels, N, domain_length
     implicit none(type, external)
     private
     public :: rbgs_smoother, multigrid_setup, copy_afac_to_multigrid, &
-              copy_multigrid_to_afac, restriction_operator, prolongation_operator, multigrid_residual
+              copy_multigrid_to_afac, restriction_operator, prolongation_operator, multigrid_residual, &
+              apply_multigrd_correction
 
 contains
 
@@ -50,10 +51,10 @@ contains
     !! Allocates the multigrid grids with the correct size and initializes them to zero.
     !!
     !! @param[inout] grid Allocatable Multigrid levels.
-    subroutine multgrid_setup(grid)
+    subroutine multigrid_setup(grid)
         implicit none(type, external)
         type(grid_level), intent(inout), allocatable :: grid(:)
-        integer :: i, k, l, N_local
+        integer :: i, N_local
 
         if (.not. allocated(grid)) then
             allocate (grid(multigrid_levels))
@@ -177,7 +178,7 @@ contains
                     k_coarse_neigh = k_coarse + merge(-1, 1, mod(k, 2) == 0)
                     l_coarse_neigh = l_coarse + merge(-1, 1, mod(l, 2) == 0)
 
-                    grid(j - 1)%res(i, k, l) = wx*wy*wz*grid(j)%x(i_coarse, k_coarse, l_coarse) + &
+                    grid(j - 1)%err(i, k, l) = wx*wy*wz*grid(j)%x(i_coarse, k_coarse, l_coarse) + &
                                                (1.d0 - wx)*wy*wz*grid(j)%x(i_coarse_neigh, k_coarse, l_coarse) + &
                                                wx*(1.d0 - wy)*wz*grid(j)%x(i_coarse, k_coarse_neigh, l_coarse) + &
                                                wx*wy*(1.d0 - wz)*grid(j)%x(i_coarse, k_coarse, l_coarse_neigh) + &
@@ -217,4 +218,28 @@ contains
         !$OMP end parallel do
 
     end subroutine multigrid_residual
+
+    !> Applies the correction
+    !!
+    !! Applies the correction of the coarser grid to the finer grid.
+    !!
+    !! @param[in] j multigrid level index
+    subroutine apply_multigrd_correction(j)
+        implicit none(type, external)
+        integer, intent(in) :: j
+        integer :: i, k, l, N_local
+
+        N_local = grid(j)%N_grid
+
+        !$OMP parallel do collapse(3) private(i,k,l) schedule(static)
+        do l = 2, N_local + 1
+            do k = 2, N_local + 1
+                do i = 2, N_local + 1
+                    grid(j)%x(i, k, l) = grid(j)%x(i, k, l) + grid(j)%err(i, k, l)
+                end do
+            end do
+        end do
+        !$OMP end parallel do
+
+    end subroutine apply_multigrd_correction
 end module multigrid_solver

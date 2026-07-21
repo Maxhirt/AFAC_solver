@@ -6,6 +6,7 @@ add_library(AFAC_solver_lib
     multigrid_solver.f90
     output.f90
     setup.f90
+    setup_initial_condition.f90
 )
 
 set_target_properties(AFAC_solver_lib PROPERTIES

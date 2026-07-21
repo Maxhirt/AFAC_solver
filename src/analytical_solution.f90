@@ -1,6 +1,7 @@
 module analytical_solution
 
-    use setup, only: N, fourpi, G, rho, boundary_value, ana_solution, relative_error
+    use setup, only: N, fourpi, G, rho, boundary_type, ana_solution, relative_error, x
+    use boundary, only: boundary_value
 
     private
     public :: analytical_solution_calculator

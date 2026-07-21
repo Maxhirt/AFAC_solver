@@ -1,9 +1,11 @@
 module afac
-    use setup, only: N, x, b, domain_length_global, domain_length
-    use setup, only: hloc, centerloc_grid, grid
+    use setup, only: N, x, b, global_domain_length, domain_length,hloc, grid, err, res,coarse_comp_x,restricted_interface,multigrid_max_iterations,grid,multigrid_levels,&
+                     error_buffer, error_buffer_recv, error_copy
     use boundary, only: init_boundary
     use communication, only: interface_exchange, pack_error, unpack_error
-    use multigrid_solver, only: rbgs_smoother, multigrid_setup, copy_afac_to_multigrid, copy_multigrid_to_afac, restriction_operator, prolongation_operator, multigrid_residual
+    use multigrid_solver, only: rbgs_smoother, multigrid_setup, copy_afac_to_multigrid, copy_multigrid_to_afac, restriction_operator, prolongation_operator, multigrid_residual, &
+                                apply_multigrd_correction
+
     implicit none(type, external)
 
     private
@@ -18,12 +20,10 @@ contains
     !!
     subroutine setup_afac()
         implicit none(type, external)
-        integer :: i, k, l
         double precision :: h
 
-        h = domain_length_global/N
+        h = global_domain_length/N
         hloc = h/(2.d0**(THIS_IMAGE() - 1))
-        centerloc_grid = (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0
 
         call init_boundary()
 
@@ -40,8 +40,9 @@ contains
     !! @param[out] param2 Description of param2.
     subroutine residual()
         implicit none(type, external)
-        double precision :: hloc_grid_sq_inv
+        double precision :: hloc_grid_sq_inv, local_laplacian
         integer :: i, k, l
+        integer :: mid_start, mid_end
 
         call interface_exchange()
 
@@ -53,14 +54,18 @@ contains
             call zombie_cells()
         end if
 
+        mid_start = (N/4) + 2
+        mid_end = (3*N/4) + 1
+
         !$OMP parallel do collapse(3) private(i,k,l,local_laplacian) schedule(static)
         do l = 2, N + 1
             do k = 2, N + 1
                 do i = 2, N + 1
 
-                    if (levels%bitmask(i, k, l) == 1) then
-                        levels%composite_res(i, k, l) = 0.d0
-
+                    if ((i >= mid_start .and. i <= mid_end) .and. &
+                        (l >= mid_start .and. l <= mid_end) .and. &
+                        (k >= mid_start .and. k <= mid_end)) then
+                        res(i, k, l) = 0.d0
                     else
                         local_laplacian = (x(i + 1, k, l) + x(i - 1, k, l) + &
                                            x(i, k + 1, l) + x(i, k - 1, l) + &
@@ -259,7 +264,7 @@ contains
         end do
         !$OMP end parallel do
 
-        !$OMP parallel do collapse(2) private(l,k,i,index_zero) schedule(static)
+        !$OMP parallel do collapse(2) private(l,k,i) schedule(static)
         do k = N/4 + 2, 3*N/4 + 1
             do i = N/4 + 2, 3*N/4 + 1
                 l = N/4 + 2
@@ -269,7 +274,7 @@ contains
         end do
         !$OMP end parallel do
 
-        !$OMP parallel do collapse(2) private(l,k,i,index_zero) schedule(static)
+        !$OMP parallel do collapse(2) private(l,k,i) schedule(static)
         do k = N/4 + 2, 3*N/4 + 1
             do i = N/4 + 2, 3*N/4 + 1
                 l = 3*N/4 + 1
@@ -290,18 +295,22 @@ contains
     subroutine l2_norm_residual(L2_error)
         implicit none(type, external)
         double precision, intent(OUT) :: L2_error
-        integer :: i, k, l, num_cells
+        integer :: i, k, l, num_cells, mid_start, mid_end
         double precision :: local_l2_error, c_sum
 
         c_sum = 0.d0
         num_cells = 0
         L2_error = 0.d0
+        mid_start = (N/4) + 2
+        mid_end = (3*N/4) + 1
 
         !$OMP parallel do collapse(3) reduction(+:num_cells, c_sum) private(i,k,l,local_l2_error) schedule(static)
         do l = 2, N + 1
             do k = 2, N + 1
                 do i = 2, N + 1
-                    if (bitmask(i, k, l) == 1) then
+                    if ((i >= mid_start .and. i <= mid_end) .and. &
+                        (l >= mid_start .and. l <= mid_end) .and. &
+                        (k >= mid_start .and. k <= mid_end)) then
                         local_l2_error = 0.d0
                     else
                         local_l2_error = res(i, k, l)
@@ -328,22 +337,24 @@ contains
         implicit none(type, external)
         integer :: runs, i
         runs = 0
-        call setup_multigrid(grid)
+        x = 0.d0
+        err = 0.d0
+        call multigrid_setup(grid)
         call copy_afac_to_multigrid
 
         do while (runs < multigrid_max_iterations)
-            call rbgs_smoother(grid(1))
-            call multigrid_residual(grid(1))
+            call rbgs_smoother(1)
+            call multigrid_residual(1)
             do i = 2, multigrid_levels
                 call restriction_operator(i - 1)
-                call rbgs_smoother(grid(i))
-                call multigrid_residual(grid(i))
+                call rbgs_smoother(i)
+                call multigrid_residual(i)
             end do
 
             do i = (multigrid_levels - 1), 1, -1
                 call prolongation_operator(i + 1)
-                call rbgs_smoother(grid(i))
-                call multigrid_residual(grid(i))
+                call apply_multigrd_correction(i)
+                call rbgs_smoother(i)
             end do
             runs = runs + 1
         end do

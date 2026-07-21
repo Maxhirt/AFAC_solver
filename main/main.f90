@@ -16,7 +16,7 @@ program main
         print *, "Beginning first residual calculation "
     end if
     call residual()
-    call l2_norm_residual()
+    call l2_norm_residual(l2_norm)
     if (THIS_IMAGE() == 1) then
         print *, "Starting calculation with l2_error:  ", l2_norm
     end if
@@ -29,7 +29,7 @@ program main
         call residual()
         if (num_runs > 10) then
             if (mod(num_runs, 2) /= 0) then
-                call l2_norm_residual()
+                call l2_norm_residual(l2_norm)
             end if
         end if
         if (THIS_IMAGE() == 1) then
@@ -40,5 +40,5 @@ program main
 
     end do
     sync all
-    call output_results_global()
+    call output_results_global(num_runs)
 end program main

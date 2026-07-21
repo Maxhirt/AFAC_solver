@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 
 project(AFAC_solver LANGUAGES Fortran)
 
@@ -22,7 +22,7 @@ set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 set(TEST_DIR ${CMAKE_SOURCE_DIR}/tests)
 set(MAIN_DIR ${CMAKE_SOURCE_DIR}/main)
 
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp -cpp -O3 -traceback  -warn all -xHost -qopenmp -coarray=distributed, -coarray-config_file=config.caf")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp -cpp -O3 -traceback  -warn all -xHost -qopenmp -coarray=distributed -coarray-config-file=config.caf")
 
 
 add_subdirectory(src)

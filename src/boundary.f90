@@ -1,14 +1,14 @@
 module boundary
     use setup, only: N, x, b, boundary_type, &
                      G, rho, rsp_sphere, domain_length, &
-                     hloc, pi, fourpi, rho0_sphere, &
+                     hloc, pi, fourpi, rho_sphere, &
                      offset_x1, offset_x2, rsp1, &
-                     rho1, rsp2, rho2, semi_x, semi_z
+                     rho1, rsp2, rho2, semi_x, semi_z, r_c
 
     implicit none(type, external)
 
     private
-    public :: init_boundary
+    public :: init_boundary, boundary_value
 
 contains
 
@@ -17,7 +17,7 @@ contains
 
         integer, intent(in) :: i, k, l
         double precision :: xpos, ypos, zpos, radius, radius1, radius2, grav1, grav2
-        double precision :: prom1, prom2, lambda, I1
+        double precision :: prom1, prom2, lambda, I1, AA1, AA2, AA3, E, sqroot
 
         xpos = (i - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
         ypos = (k - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
@@ -30,22 +30,22 @@ contains
 
         case (0) !homogenous sphere
             if (radius <= rsp_sphere) then
-                boundary_value = -2*pi*G*rho0_sphere*(rsp_sphere**2 - radius**2/3.d0)
+                boundary_value = -2*pi*G*rho_sphere*(rsp_sphere**2 - radius**2/3.d0)
 
             else
-                boundary_value = -4.d0*pi*G*rho0_sphere*rsp_sphere**3/(3.d0*radius)
+                boundary_value = -4.d0*pi*G*rho_sphere*rsp_sphere**3/(3.d0*radius)
             end if
 
         case (1) !binary
             if (radius1 <= rsp1) then
-                grav1 = -2*pi*G*rhosp1*(rsp1**2 - radius1**2/3.d0)
+                grav1 = -2*pi*G*rho1*(rsp1**2 - radius1**2/3.d0)
             else
-                grav1 = -4*pi*G*rhosp1*rsp1**3/(3.d0*radius1)
+                grav1 = -4*pi*G*rho1*rsp1**3/(3.d0*radius1)
             end if
             if (radius2 <= rsp2) then
-                grav2 = -2*pi*G*rhosp2*(rsp2**2 - radius2**2/3.d0)
+                grav2 = -2*pi*G*rho2*(rsp2**2 - radius2**2/3.d0)
             else
-                grav2 = -4*pi*G*rhosp2*rsp2**3/(3.d0*radius2)
+                grav2 = -4*pi*G*rho2*rsp2**3/(3.d0*radius2)
             end if
             boundary_value = grav1 + grav2
 
@@ -54,20 +54,24 @@ contains
             if (radius <= 1.d-12) then
                 boundary_value = 0.d0
             else if (radius <= rsp_sphere) then
-                boundary_value = fourpi*G*rho0_sphere*r_c**2* &
+                boundary_value = fourpi*G*rho_sphere*r_c**2* &
                                  (atan(radius/r_c)/(radius/r_c) + log((1.d0 + &
                                                                        (radius/r_c)**2)/(1.d0 + (rsp_sphere/r_c)**2))/2.d0 - 1.d0)
 
             else
-                boundary_value = -fourpi*G*rho0_sphere*r_c**3*(rsp_sphere/r_c - atan(rsp_sphere/r_c))/radius
+                boundary_value = -fourpi*G*rho_sphere*r_c**3*(rsp_sphere/r_c - atan(rsp_sphere/r_c))/radius
 
             end if
 
         case (3) ! homogenous ellipsoid
 
+            E = sqrt(1.d0 - (semi_z/semi_x)**2)
+            AA1 = (sqrt(1.d0 - E**2)/E**3)*asin(E) - (1.d0 - E**2)/E**2
+            AA3 = (2.d0/E**2) - 2.d0*(sqrt(1 - E**2)/E**3)*asin(E)
+
             if (radius**2/semi_x**2 + zpos**2/semi_z**2 <= 1.d0) then
-                boundary_value = -pi*G*rho0*(semi_x**2*AA1 + semi_x**2*AA1 + &
-                                             semi_z**2*AA3 - AA1*radius**2 - AA3*zpos**2)
+                boundary_value = -pi*G*rho_sphere*(semi_x**2*AA1 + semi_x**2*AA1 + &
+                                                   semi_z**2*AA3 - AA1*radius**2 - AA3*zpos**2)
             else
 
                 prom1 = radius**2 + zpos**2 - semi_x**2 - semi_z**2
@@ -80,11 +84,11 @@ contains
                      2.d0/sqrt(semi_x**2 - semi_z**2)*atan(sqrt((semi_z**2 + lambda)/(semi_x**2 - semi_z**2)))
                 sqroot = sqrt(semi_z**2 + lambda)
 
-                boundary_value = -pi*G*rho0*semi_x**2*semi_z*((1.d0 + radius**2/(2.d0*(semi_z**2 - semi_x**2)) - &
-                                                               zpos**2/(semi_z**2 - semi_x**2))*I1 - &
-                                                              radius**2*sqroot/((semi_z**2 - semi_x**2)*(semi_x**2 + lambda)) - &
-                                                              zpos**2*(2.d0/((semi_x**2 + lambda)*sqroot) - &
-                                                                       2.d0*sqroot/((semi_z**2 - semi_x**2)*(semi_x**2 + lambda))))
+                boundary_value = -pi*G*rho_sphere*semi_x**2*semi_z*((1.d0 + radius**2/(2.d0*(semi_z**2 - semi_x**2)) - &
+                                                                     zpos**2/(semi_z**2 - semi_x**2))*I1 - &
+                                                                 radius**2*sqroot/((semi_z**2 - semi_x**2)*(semi_x**2 + lambda)) - &
+                                                                    zpos**2*(2.d0/((semi_x**2 + lambda)*sqroot) - &
+                                                                        2.d0*sqroot/((semi_z**2 - semi_x**2)*(semi_x**2 + lambda))))
 
             end if
 

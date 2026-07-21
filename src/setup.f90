@@ -1,3 +1,7 @@
+#ifndef GRID_N
+#define GRID_N 64
+#endif
+
 module setup
     implicit none(type, external)
     private
@@ -6,7 +10,8 @@ module setup
               rho1, rsp2, rho2, offset_x1, offset_x2, x, b, res, err, &
               rho, bitmask, ana_solution, domain_length, hloc, grid, G, boundary_type, semi_x, &
               semi_z, restricted_interface, restricted_interface_buffer, coarse_cell_buffer, &
-              restricted_interface_buffer_recv, error_copy, error_buffer, error_buffer_recv, relative_error, epsilon
+              restricted_interface_buffer_recv, error_copy, error_buffer, error_buffer_recv, relative_error, epsilon, N, &
+              multigrid_max_iterations, rbgs_max_iterations, max_iterations, coarse_cell_buffer_recv, r_c, coarse_comp_x, grid_level
 
     double precision, PARAMETER :: pi = 3.14159265358973238462d0
     double precision, PARAMETER :: fourpi = 4*pi
@@ -14,11 +19,8 @@ module setup
     double precision, PARAMETER :: G = 1.d0
     double precision, PARAMETER :: epsilon = 1.d-10
 
-#ifndef GRID_N
-#define GRID_N 64
-#endif
     ! Number of grid points and domain definition
-    integer, PARAMETER :: N = Grid_N
+    integer, PARAMETER :: N = GRID_N
     integer, PARAMETER :: NSLAE = (N + 2)*(N + 2)*(N + 2)
     integer, PARAMETER :: global_domain_length = 1.d0
     integer, PARAMETER :: multigrid_levels = 3
@@ -37,6 +39,7 @@ module setup
     double precision, PARAMETER :: offset_x2 = 1.d0
     double precision, PARAMETER :: semi_x = 1.d0
     double precision, PARAMETER :: semi_z = 0.5d0
+    double precision, PARAMETER :: r_c = 0.1d0
 
     ! Arrays
     double precision :: x(N + 2, N + 2, N + 2)
@@ -61,7 +64,7 @@ module setup
         double precision, Allocatable :: x(:, :, :)
         double precision, Allocatable :: b(:, :, :)
         integer :: N_grid
-        double precision :: holc_grid
+        double precision :: hloc_grid
     end type grid_level
 
     type(grid_level), Allocatable :: grid(:)
@@ -73,7 +76,7 @@ module setup
     double precision :: restricted_interface_buffer_recv(6*(N/2)*(N/2))
     double precision :: coarse_comp_x(N + 2, N + 2, N + 2)
     DOUBLE PRECISION :: coarse_cell_buffer_recv(6*(N/2 + 2)*(N/2 + 2))
-    double precision :: err_copy(N/4 + 1:3*N/4 + 2, N/4 + 1:3*N/4 + 2, N/4 + 1:3*N/4 + 2)
+    double precision :: error_copy(N/4 + 1:3*N/4 + 2, N/4 + 1:3*N/4 + 2, N/4 + 1:3*N/4 + 2)
     double precision :: error_buffer((N/2 + 2)*(N/2 + 2)*(N/2 + 2)) [*]
     double precision :: error_buffer_recv((N/2 + 2)*(N/2 + 2)*(N/2 + 2))
 

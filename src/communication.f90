@@ -221,7 +221,7 @@ contains
     !! Uses the coarse cell buffer to communcate with the finer grid.
     subroutine pack_coarse
         implicit none(type, external)
-        integer :: i, k, l, idx, index_zero
+        integer :: i, k, l, idx
 
         idx = 1
 
@@ -340,7 +340,7 @@ contains
     !! Unpacks the receiving buffer into the coarse component x.
     subroutine unpack_coarse
         implicit none(type, external)
-        integer :: i, k, l, idx, index_zero
+        integer :: i, k, l, idx
 
         idx = 1
 
@@ -423,19 +423,19 @@ contains
     !! This is done via a parallelized indexing.
     subroutine unpack_error()
         implicit none(type, external)
-        integer :: i, k, l, idx, N_start, N_end_L_size
+        integer :: i, k, l, idx, N_start, N_end, L_size
 
         N_start = N/4 + 1
         N_end = 3*N/4 + 2
         L_size = N_end - N_start + 1
-        !$OMP parallel do collapse(3) private(l,k,i,index_zero,idx)
+        !$OMP parallel do collapse(3) private(l,k,i,idx)
         do l = N_start, N_end
             do k = N_start, N_end
                 do i = N_start, N_end
                     idx = 1 + (i - N_start) + &
                           (k - N_start)*L_size + &
                           (l - N_start)*L_size*L_size
-                    err_copy(i, k, l) = error_buffer_recv(idx)
+                    error_copy(i, k, l) = error_buffer_recv(idx)
                 end do
             end do
         end do
