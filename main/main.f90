@@ -3,7 +3,7 @@ program main
     use afac, only: setup_afac, error_projection, residual, l2_norm_residual, multigrid_afac
     use output, only: output_results_global
     use setup_initial_condition, only: initial_condition
-
+    use analytical_solution, only: analytical_solution_calculator
     implicit none(type, external)
     integer :: num_runs
     double precision :: l2_norm
@@ -38,5 +38,6 @@ program main
 
     end do
     sync all
+    call analytical_solution_calculator()
     call output_results_global(num_runs)
 end program main

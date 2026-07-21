@@ -19,9 +19,9 @@ contains
         double precision :: xpos, ypos, zpos, radius, radius1, radius2, grav1, grav2
         double precision :: prom1, prom2, lambda, I1, AA1, AA2, AA3, E, sqroot
 
-        xpos = (i - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-        ypos = (k - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-        zpos = (l - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
+        xpos = (i - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+        ypos = (k - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+        zpos = (l - 1)*hloc - domain_length/2.d0 - hloc/2.d0
         radius = sqrt(xpos**2 + ypos**2 + zpos**2)
         radius1 = sqrt((xpos - offset_x1)*(xpos - offset_x1) + ypos*ypos + zpos*zpos)
         radius2 = sqrt((xpos - offset_x2)*(xpos - offset_x2) + ypos*ypos + zpos*zpos)

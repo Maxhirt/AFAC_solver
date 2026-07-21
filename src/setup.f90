@@ -22,7 +22,7 @@ module setup
     ! Number of grid points and domain definition
     integer, PARAMETER :: N = GRID_N
     integer, PARAMETER :: NSLAE = (N + 2)*(N + 2)*(N + 2)
-    integer, PARAMETER :: global_domain_length = 1.d0
+    double precision, PARAMETER :: global_domain_length = 1.d0
     integer, PARAMETER :: multigrid_levels = 3
     integer, PARAMETER :: multigrid_max_iterations = 10
     integer, PARAMETER :: rbgs_max_iterations = 5

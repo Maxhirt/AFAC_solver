@@ -17,3 +17,7 @@ package-mode = false
 
 [dependency-groups]
 dev = ["fortls (>=3.2.2,<4.0.0)", "fortitude (>=0.1.9.12,<0.2.0.0)", "fprettify (>=0.3.7,<0.4.0)", "pre-commit (>=4.6.0,<5.0.0)"]
+
+[tool.poetry.dependencies]
+pandas = "^3.0.3"
+matplotlib = "^3.11.1"

@@ -21,7 +21,7 @@ contains
 
         write (filename, "(A,I0,A)") "global_it_", run, ".dat"
         if (this_image() == 1) then
-            open (unit=u_comb, file=filename, status="replace", action="write")
+            open (newunit=u_comb, file=filename, status="replace", action="write")
             write (u_comb, '(A)') '# Level  Xpos           Ypos           Zpos           Numerical      Analytical     Rel_Error'
             close (u_comb)
         end if
@@ -41,10 +41,10 @@ contains
                         (l >= mid_start .and. l <= mid_end) .and. &
                         (k >= mid_start .and. k <= mid_end)) cycle
 
-                    xpos = (i - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-                    ypos = (k - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-                    zpos = (l - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-           write (u_comb, '(I5, 2X, 6(E14.7, 2X), I2)') xpos, ypos, zpos, x(i, k, l), ana_solution(i, k, l), relative_error(i, k, l)
+                    xpos = (i - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+                    ypos = (k - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+                    zpos = (l - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+           write (u_comb, '(I5, 2X, 6(E14.7, 2X), I2)') this_image(), xpos, ypos, zpos, x(i, k, l), ana_solution(i, k, l), relative_error(i, k, l)
 
                 end do
                 end do
@@ -64,7 +64,7 @@ contains
                 xpos = (i - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
                 ypos = (k - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
                 zpos = (l - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-           write (u_comb, '(I5, 2X, 6(E14.7, 2X), I2)') xpos, ypos, zpos, x(i, k, l), ana_solution(i, k, l), relative_error(i, k, l)
+           write (u_comb, '(I5, 2X, 6(E14.7, 2X), I2)') this_image(), xpos, ypos, zpos, x(i, k, l), ana_solution(i, k, l), relative_error(i, k, l)
 
             end do
             end do

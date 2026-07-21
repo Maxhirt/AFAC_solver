@@ -24,6 +24,7 @@ contains
 
         h = global_domain_length/N
         hloc = h/(2.d0**(THIS_IMAGE() - 1))
+        domain_length = global_domain_length/(2.d0**(THIS_IMAGE() - 1))
 
         call init_boundary()
 
@@ -56,28 +57,47 @@ contains
 
         mid_start = (N/4) + 2
         mid_end = (3*N/4) + 1
+        hloc_grid_sq_inv = 1.d0/(hloc*hloc)
+        local_laplacian = 0.d0
+        if (this_image() < num_images()) then
+            !$OMP parallel do collapse(3) private(i,k,l,local_laplacian) schedule(static)
+            do l = 2, N + 1
+                do k = 2, N + 1
+                    do i = 2, N + 1
 
-        !$OMP parallel do collapse(3) private(i,k,l,local_laplacian) schedule(static)
-        do l = 2, N + 1
-            do k = 2, N + 1
-                do i = 2, N + 1
+                        if ((i >= mid_start .and. i <= mid_end) .and. &
+                            (l >= mid_start .and. l <= mid_end) .and. &
+                            (k >= mid_start .and. k <= mid_end)) then
+                            res(i, k, l) = 0.d0
+                        else
+                            local_laplacian = (x(i + 1, k, l) + x(i - 1, k, l) + &
+                                               x(i, k + 1, l) + x(i, k - 1, l) + &
+                                               x(i, k, l + 1) + x(i, k, l - 1) - &
+                                               (6.d0*x(i, k, l)))*hloc_grid_sq_inv
+                            res(i, k, l) = b(i, k, l) - local_laplacian
+                        end if
 
-                    if ((i >= mid_start .and. i <= mid_end) .and. &
-                        (l >= mid_start .and. l <= mid_end) .and. &
-                        (k >= mid_start .and. k <= mid_end)) then
-                        res(i, k, l) = 0.d0
-                    else
+                    end do
+                end do
+            end do
+            !$OMP end parallel do
+        else
+            !$OMP parallel do collapse(3) private(i,k,l,local_laplacian) schedule(static)
+            do l = 2, N + 1
+                do k = 2, N + 1
+                    do i = 2, N + 1
+
                         local_laplacian = (x(i + 1, k, l) + x(i - 1, k, l) + &
                                            x(i, k + 1, l) + x(i, k - 1, l) + &
                                            x(i, k, l + 1) + x(i, k, l - 1) - &
                                            (6.d0*x(i, k, l)))*hloc_grid_sq_inv
                         res(i, k, l) = b(i, k, l) - local_laplacian
-                    end if
 
+                    end do
                 end do
             end do
-        end do
-        !$OMP end parallel do
+            !$OMP end parallel do
+        end if
 
     end subroutine residual
 
@@ -93,7 +113,7 @@ contains
         double precision :: hloc_coarse, hloc_coarse_inv2, sz, sy, sx, gradient_y, gradient_z, gradient_x
         integer :: i, l, k, l_coarse, k_coarse, i_coarse
 
-        hloc_coarse = (domain_length/N)/(2.d0**(this_image() - 2))
+        hloc_coarse = domain_length/N
         hloc_coarse_inv2 = 1/(2*hloc_coarse)
 
         !$OMP PARALLEL PRIVATE(l,k,i,gradient_x,gradient_y,gradient_z,sx,sy,sz,l_coarse,k_coarse,i_coarse)
@@ -104,11 +124,10 @@ contains
                 sz = merge(1.d0, -1.d0, mod(l, 2) /= 0)
                 sy = merge(1.d0, -1.d0, mod(k, 2) /= 0)
 
-                l_coarse = (l + N/2 + 2)/2 - 1
-                k_coarse = (k + N/2 + 2)/2 - 1
-
+                l_coarse = N/4 + 1 + l/2
+                k_coarse = N/4 + 1 + k/2
                 i = 1
-                i_coarse = (i + N/2 + 2)/2
+                i_coarse = N/4 + 1 + i/2
 
                 gradient_y = (coarse_comp_x(i_coarse, k_coarse + 1, l_coarse) - coarse_comp_x(i_coarse, k_coarse - 1, l_coarse)) &
                              *hloc_coarse_inv2
@@ -121,7 +140,7 @@ contains
 
                 i = N + 2
 
-                i_coarse = (i + N/2 + 2)/2
+                i_coarse = N/4 + 1 + i/2
                 gradient_y = (coarse_comp_x(i_coarse, k_coarse + 1, l_coarse) - coarse_comp_x(i_coarse, k_coarse - 1, l_coarse)) &
                              *hloc_coarse_inv2
                 gradient_z = (coarse_comp_x(i_coarse, k_coarse, l_coarse + 1) - coarse_comp_x(i_coarse, k_coarse, l_coarse - 1)) &
@@ -141,12 +160,12 @@ contains
                 sz = merge(1.d0, -1.d0, mod(l, 2) /= 0)
                 sx = merge(1.d0, -1.d0, mod(i, 2) /= 0)
 
-                l_coarse = (l + N/2 + 2)/2 - 1
-                i_coarse = (i + N/2 + 2)/2
+                l_coarse = N/4 + 1 + l/2
+                i_coarse = N/4 + 1 + i/2
 
                 ! --- k = 1 ---
                 k = 1
-                k_coarse = (k + N/2 + 2)/2 - 1
+                k_coarse = N/4 + 1 + k/2
                 gradient_x = (coarse_comp_x(i_coarse + 1, k_coarse, l_coarse) - coarse_comp_x(i_coarse - 1, k_coarse, l_coarse)) &
                              *hloc_coarse_inv2
                 gradient_z = (coarse_comp_x(i_coarse, k_coarse, l_coarse + 1) - coarse_comp_x(i_coarse, k_coarse, l_coarse - 1)) &
@@ -158,7 +177,7 @@ contains
 
                 ! --- k = N+2 ---
                 k = N + 2
-                k_coarse = (k + N/2 + 2)/2 - 1
+                k_coarse = N/4 + 1 + k/2
 
                 gradient_x = (coarse_comp_x(i_coarse + 1, k_coarse, l_coarse) - coarse_comp_x(i_coarse - 1, k_coarse, l_coarse)) &
                              *hloc_coarse_inv2
@@ -178,12 +197,12 @@ contains
                 sy = merge(1.d0, -1.d0, mod(k, 2) /= 0)
                 sx = merge(1.d0, -1.d0, mod(i, 2) /= 0)
 
-                k_coarse = (k + N/2 + 2)/2 - 1
-                i_coarse = (i + N/2 + 2)/2
+                k_coarse = N/4 + 1 + k/2
+                i_coarse = N/4 + 1 + i/2
 
                 ! --- l = 1 ---
                 l = 1
-                l_coarse = (l + N/2 + 2)/2 - 1
+                l_coarse = N/4 + 1 + l/2
                 gradient_x = (coarse_comp_x(i_coarse + 1, k_coarse, l_coarse) - &
                               coarse_comp_x(i_coarse - 1, k_coarse, l_coarse)) &
                              *hloc_coarse_inv2
@@ -197,7 +216,7 @@ contains
 
                 ! --- l = N+2 ---
                 l = N + 2
-                l_coarse = (l + N/2 + 2)/2 - 1
+                l_coarse = N/4 + 1 + l/2
                 gradient_x = (coarse_comp_x(i_coarse + 1, k_coarse, l_coarse) - coarse_comp_x(i_coarse - 1, k_coarse, l_coarse)) &
                              *hloc_coarse_inv2
                 gradient_y = (coarse_comp_x(i_coarse, k_coarse + 1, l_coarse) - coarse_comp_x(i_coarse, k_coarse - 1, l_coarse)) &
@@ -337,8 +356,6 @@ contains
         implicit none(type, external)
         integer :: runs, i
         runs = 0
-        x = 0.d0
-        err = 0.d0
         call multigrid_setup(grid)
         call copy_afac_to_multigrid
 
@@ -346,6 +363,8 @@ contains
             call rbgs_smoother(1)
             call multigrid_residual(1)
             do i = 2, multigrid_levels
+                grid(i)%x = 0.d0
+                grid(i)%err = 0.d0
                 call restriction_operator(i - 1)
                 call rbgs_smoother(i)
                 call multigrid_residual(i)
@@ -435,18 +454,31 @@ contains
         integer :: i, k, l, mid_start, mid_end
         mid_start = (N/4) + 2
         mid_end = (3*N/4) + 1
-        !$OMP parallel do collapse(3) private(i,k,l) schedule(static)
-        do l = 2, N + 1
-        do k = 2, N + 1
-        do i = 2, N + 1
-            if ((i >= mid_start .and. i <= mid_end) .and. &
-                (l >= mid_start .and. l <= mid_end) .and. &
-                (k >= mid_start .and. k <= mid_end)) cycle
-            x(i, k, l) = x(i, k, l) + err(i, k, l)
-        end do
-        end do
-        end do
-        !$OMP end parallel do
+        if (this_image() < num_images()) then
+            !$OMP parallel do collapse(3) private(i,k,l) schedule(static)
+            do l = 2, N + 1
+            do k = 2, N + 1
+            do i = 2, N + 1
+                if ((i >= mid_start .and. i <= mid_end) .and. &
+                    (l >= mid_start .and. l <= mid_end) .and. &
+                    (k >= mid_start .and. k <= mid_end)) cycle
+                x(i, k, l) = x(i, k, l) + err(i, k, l)
+            end do
+            end do
+            end do
+            !$OMP end parallel do
+        else
+            !$OMP parallel do collapse(3) private(i,k,l) schedule(static)
+            do l = 2, N + 1
+            do k = 2, N + 1
+            do i = 2, N + 1
+                x(i, k, l) = x(i, k, l) + err(i, k, l)
+            end do
+            end do
+            end do
+            !$OMP end parallel do
+
+        end if
 
     end subroutine error_reconciliation
 

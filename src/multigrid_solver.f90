@@ -172,9 +172,9 @@ contains
         do l = 2, N_fine + 1
             do k = 2, N_fine + 1
                 do i = 2, N_fine + 1
-                    i_coarse = 2*i - 1
-                    k_coarse = 2*k - 1
-                    l_coarse = 2*l - 1
+                    i_coarse = i/2 + 1
+                    k_coarse = k/2 + 1
+                    l_coarse = l/2 + 1
 
                     i_coarse_neigh = i_coarse + merge(-1, 1, mod(i, 2) == 0)
                     k_coarse_neigh = k_coarse + merge(-1, 1, mod(k, 2) == 0)
@@ -208,9 +208,9 @@ contains
         N_local = grid(j)%N_grid
         hloc_sqr_inv = 1.d0/(grid(j)%hloc_grid*grid(j)%hloc_grid)
         !$OMP parallel do collapse(3) private(i,k,l) schedule(static)
-        do l = 2, N_local
-        do k = 2, N_local
-        do i = 2, N_local
+        do l = 2, N_local + 1
+        do k = 2, N_local + 1
+        do i = 2, N_local + 1
             grid(j)%res(i, k, l) = grid(j)%b(i, k, l) - &
                               (grid(j)%x(i - 1, k, l) + grid(j)%x(i + 1, k, l) + grid(j)%x(i, k + 1, l) + grid(j)%x(i, k - 1, l) + &
                                     grid(j)%x(i, k, l + 1) + grid(j)%x(i, k, l - 1) - (6.d0*grid(j)%x(i, k, l)))*hloc_sqr_inv
