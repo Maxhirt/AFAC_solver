@@ -57,10 +57,12 @@ contains
         integer :: i, N_local
 
         if (.not. allocated(grid)) then
+            print *, "Allocating multigrid grid levels"
             allocate (grid(multigrid_levels))
         end if
 
         do i = 1, multigrid_levels
+            print *, "Allocating grid level ", i
             if (.not. allocated(grid(i)%res)) then
                 N_local = N/(2**(i - 1))
                 grid(i)%N_grid = N_local
@@ -211,7 +213,7 @@ contains
         do i = 2, N_local
             grid(j)%res(i, k, l) = grid(j)%b(i, k, l) - &
                               (grid(j)%x(i - 1, k, l) + grid(j)%x(i + 1, k, l) + grid(j)%x(i, k + 1, l) + grid(j)%x(i, k - 1, l) + &
-                                    grid(j)%x(i, k, l + 1) + grid(j)%x(i, k, l - 1) - 6.d0*grid(j)%x(i, k, l))*hloc_sqr_inv
+                                    grid(j)%x(i, k, l + 1) + grid(j)%x(i, k, l - 1) - (6.d0*grid(j)%x(i, k, l)))*hloc_sqr_inv
         end do
         end do
         end do
