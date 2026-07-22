@@ -20,9 +20,9 @@ contains
             do l = 1, N + 2
                 do k = 1, N + 2
                     do i = 1, N + 2
-                        xpos = (i - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-                        ypos = (k - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-                        zpos = (l - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
+                        xpos = (i - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+                        ypos = (k - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+                        zpos = (l - 1)*hloc - domain_length/2.d0 - hloc/2.d0
                         radius = sqrt((xpos)*(xpos) + ypos*ypos + zpos*zpos)
                         rho(i, k, l) = 1.d-7
                         if (radius <= rsp_sphere) then
@@ -37,9 +37,9 @@ contains
             do l = 1, N + 2
                 do k = 1, N + 2
                     do i = 1, N + 2
-                        xpos = (i - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-                        ypos = (k - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-                        zpos = (l - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
+                        xpos = (i - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+                        ypos = (k - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+                        zpos = (l - 1)*hloc - domain_length/2.d0 - hloc/2.d0
                         radius1 = sqrt((xpos - offset_x1)*(xpos - offset_x1) + ypos*ypos + zpos*zpos)
                         radius2 = sqrt((xpos - offset_x2)*(xpos - offset_x2) + ypos*ypos + zpos*zpos)
                         rho(i, k, l) = 1.d-7

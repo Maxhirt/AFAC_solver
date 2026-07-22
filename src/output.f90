@@ -61,9 +61,9 @@ contains
             do k = 2, N + 1
             do i = 2, N + 1
 
-                xpos = (i - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-                ypos = (k - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
-                zpos = (l - 1)*hloc - (domain_length/(2.d0**(THIS_IMAGE() - 1)))/2.d0 - hloc/2.d0
+                xpos = (i - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+                ypos = (k - 1)*hloc - domain_length/2.d0 - hloc/2.d0
+                zpos = (l - 1)*hloc - domain_length/2.d0 - hloc/2.d0
            write (u_comb, '(I5, 2X, 6(E14.7, 2X), I2)') this_image(), xpos, ypos, zpos, x(i, k, l), ana_solution(i, k, l), relative_error(i, k, l)
 
             end do

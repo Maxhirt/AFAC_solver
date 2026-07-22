@@ -1,9 +1,11 @@
 module afac
-    use setup, only: N, x, b, global_domain_length, domain_length,hloc, grid, err, res,coarse_comp_x,restricted_interface,multigrid_max_iterations,grid,multigrid_levels,&
+    use setup, only: N, x, b, global_domain_length, domain_length, hloc, grid, err, &
+                     res, coarse_comp_x, restricted_interface, multigrid_max_iterations, grid, multigrid_levels, &
                      error_buffer, error_buffer_recv, error_copy
     use boundary, only: init_boundary
     use communication, only: interface_exchange, pack_error, unpack_error
-    use multigrid_solver, only: rbgs_smoother, multigrid_setup, copy_afac_to_multigrid, copy_multigrid_to_afac, restriction_operator, prolongation_operator, multigrid_residual, &
+    use multigrid_solver, only: rbgs_smoother, multigrid_setup, copy_afac_to_multigrid, &
+                                copy_multigrid_to_afac, restriction_operator, prolongation_operator, multigrid_residual, &
                                 apply_multigrd_correction
 
     implicit none(type, external)
@@ -113,7 +115,7 @@ contains
         double precision :: hloc_coarse, hloc_coarse_inv2, sz, sy, sx, gradient_y, gradient_z, gradient_x
         integer :: i, l, k, l_coarse, k_coarse, i_coarse
 
-        hloc_coarse = domain_length/N
+        hloc_coarse = hloc*2.d0
         hloc_coarse_inv2 = 1/(2*hloc_coarse)
 
         !$OMP PARALLEL PRIVATE(l,k,i,gradient_x,gradient_y,gradient_z,sx,sy,sz,l_coarse,k_coarse,i_coarse)
@@ -322,24 +324,38 @@ contains
         L2_error = 0.d0
         mid_start = (N/4) + 2
         mid_end = (3*N/4) + 1
-
-        !$OMP parallel do collapse(3) reduction(+:num_cells, c_sum) private(i,k,l,local_l2_error) schedule(static)
-        do l = 2, N + 1
-            do k = 2, N + 1
-                do i = 2, N + 1
-                    if ((i >= mid_start .and. i <= mid_end) .and. &
-                        (l >= mid_start .and. l <= mid_end) .and. &
-                        (k >= mid_start .and. k <= mid_end)) then
-                        local_l2_error = 0.d0
-                    else
+        if (this_image() < num_images()) then
+            !$OMP parallel do collapse(3) reduction(+:num_cells, c_sum) private(i,k,l,local_l2_error) schedule(static)
+            do l = 2, N + 1
+                do k = 2, N + 1
+                    do i = 2, N + 1
+                        if ((i >= mid_start .and. i <= mid_end) .and. &
+                            (l >= mid_start .and. l <= mid_end) .and. &
+                            (k >= mid_start .and. k <= mid_end)) then
+                            local_l2_error = 0.d0
+                        else
+                            local_l2_error = res(i, k, l)
+                            c_sum = c_sum + local_l2_error**2
+                            num_cells = num_cells + 1
+                        end if
+                    end do
+                end do
+            end do
+            !$OMP end parallel do
+        else
+            !$OMP parallel do collapse(3) reduction(+:num_cells, c_sum) private(i,k,l,local_l2_error) schedule(static)
+            do l = 2, N + 1
+                do k = 2, N + 1
+                    do i = 2, N + 1
                         local_l2_error = res(i, k, l)
                         c_sum = c_sum + local_l2_error**2
                         num_cells = num_cells + 1
-                    end if
+                    end do
                 end do
             end do
-        end do
-        !$OMP end parallel do
+            !$OMP end parallel do
+        end if
+
         call co_sum(c_sum)
         call co_sum(num_cells)
         L2_error = sqrt(c_sum/num_cells)
