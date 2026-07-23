@@ -1,7 +1,7 @@
 module afac
     use setup, only: N, x, b, global_domain_length, domain_length, hloc, grid, err, &
                      res, coarse_comp_x, restricted_interface, multigrid_max_iterations, grid, multigrid_levels, &
-                     error_buffer, error_buffer_recv, error_copy
+                     error_buffer, error_buffer_recv, error_copy, val_z, count_z
     use boundary, only: init_boundary
     use communication, only: interface_exchange, pack_error, unpack_error
     use multigrid_solver, only: rbgs_smoother, multigrid_setup, copy_afac_to_multigrid, &
@@ -137,7 +137,7 @@ contains
                              *hloc_coarse_inv2
 
                 x(i, k, l) = 1.d0/3.d0*x(i + 1, k, l) + &
-                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/2.d0*(sy*gradient_y + &
+                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/4.d0*(sy*gradient_y + &
                                                                                                         sz*gradient_z))
 
                 i = N + 2
@@ -149,7 +149,7 @@ contains
                              *hloc_coarse_inv2
 
                 x(i, k, l) = 1.d0/3.d0*x(i - 1, k, l) + &
-                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/2.d0*(sy*gradient_y &
+                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/4.d0*(sy*gradient_y &
                                                                                                         + sz*gradient_z))
 
             end do
@@ -174,7 +174,7 @@ contains
                              *hloc_coarse_inv2
 
                 x(i, k, l) = 1.d0/3.d0*x(i, k + 1, l) + &
-                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/2.d0*(sx*gradient_x + &
+                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/4.d0*(sx*gradient_x + &
                                                                                                         sz*gradient_z))
 
                 ! --- k = N+2 ---
@@ -187,7 +187,7 @@ contains
                              *hloc_coarse_inv2
 
                 x(i, k, l) = 1.d0/3.d0*x(i, k - 1, l) + &
-                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/2.d0*(sx*gradient_x + &
+                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/4.d0*(sx*gradient_x + &
                                                                                                         sz*gradient_z))
             end do
         end do
@@ -213,7 +213,7 @@ contains
                              *hloc_coarse_inv2
 
                 x(i, k, l) = 1.d0/3.d0*x(i, k, l + 1) + &
-                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/2.d0* &
+                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/4.d0* &
                                         (sx*gradient_x + sy*gradient_y))
 
                 ! --- l = N+2 ---
@@ -225,7 +225,7 @@ contains
                              *hloc_coarse_inv2
 
                 x(i, k, l) = 1.d0/3.d0*x(i, k, l - 1) + &
-                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/2.d0 &
+                             2.d0/3.d0*(coarse_comp_x(i_coarse, k_coarse, l_coarse) + hloc_coarse/4.d0 &
                                         *(sx*gradient_x + sy*gradient_y))
             end do
         end do
@@ -245,12 +245,16 @@ contains
 
         integer :: i, k, l
 
+        val_z = 0.d0
+        count_z = 0
+
         !$OMP parallel do collapse(2) private(l,k,i) schedule(static)
         do l = N/4 + 2, 3*N/4 + 1
             do k = N/4 + 2, 3*N/4 + 1
                 i = N/4 + 2
-                x(i, k, l) = 4.d0/3.d0*restricted_interface(i, k, l, 1) - &
-                             1.d0/3.d0*x(i - 1, k, l)
+                val_z(i, k, l) = val_z(i, k, l) + 4.d0/3.d0*restricted_interface(i, k, l, 1) - &
+                                 1.d0/3.d0*x(i - 1, k, l)
+                count_z(i, k, l) = count_z(i, k, l) + 1
             end do
         end do
         !$OMP end parallel do
@@ -259,8 +263,9 @@ contains
         do l = N/4 + 2, 3*N/4 + 1
             do k = N/4 + 2, 3*N/4 + 1
                 i = 3*N/4 + 1
-                x(i, k, l) = 4.d0/3.d0*restricted_interface(i, k, l, 2) - &
-                             1.d0/3.d0*x(i + 1, k, l)
+                val_z(i, k, l) = val_z(i, k, l) + 4.d0/3.d0*restricted_interface(i, k, l, 2) - &
+                                 1.d0/3.d0*x(i + 1, k, l)
+                count_z(i, k, l) = count_z(i, k, l) + 1
             end do
         end do
         !$OMP end parallel do
@@ -269,8 +274,9 @@ contains
         do l = N/4 + 2, 3*N/4 + 1
             do i = N/4 + 2, 3*N/4 + 1
                 k = N/4 + 2
-                x(i, k, l) = 4.d0/3.d0*restricted_interface(i, k, l, 3) - &
-                             1.d0/3.d0*x(i, k - 1, l)
+                val_z(i, k, l) = val_z(i, k, l) + 4.d0/3.d0*restricted_interface(i, k, l, 3) - &
+                                 1.d0/3.d0*x(i, k - 1, l)
+                count_z(i, k, l) = count_z(i, k, l) + 1
             end do
         end do
         !$OMP end parallel do
@@ -279,8 +285,9 @@ contains
         do l = N/4 + 2, 3*N/4 + 1
             do i = N/4 + 2, 3*N/4 + 1
                 k = 3*N/4 + 1
-                x(i, k, l) = 4.d0/3.d0*restricted_interface(i, k, l, 4) - &
-                             1.d0/3.d0*x(i, k + 1, l)
+                val_z(i, k, l) = val_z(i, k, l) + 4.d0/3.d0*restricted_interface(i, k, l, 4) - &
+                                 1.d0/3.d0*x(i, k + 1, l)
+                count_z(i, k, l) = count_z(i, k, l) + 1
             end do
         end do
         !$OMP end parallel do
@@ -289,8 +296,9 @@ contains
         do k = N/4 + 2, 3*N/4 + 1
             do i = N/4 + 2, 3*N/4 + 1
                 l = N/4 + 2
-                x(i, k, l) = 4.d0/3.d0*restricted_interface(i, k, l, 5) - &
-                             1.d0/3.d0*x(i, k, l - 1)
+                val_z(i, k, l) = val_z(i, k, l) + 4.d0/3.d0*restricted_interface(i, k, l, 5) - &
+                                 1.d0/3.d0*x(i, k, l - 1)
+                count_z(i, k, l) = count_z(i, k, l) + 1
             end do
         end do
         !$OMP end parallel do
@@ -299,8 +307,21 @@ contains
         do k = N/4 + 2, 3*N/4 + 1
             do i = N/4 + 2, 3*N/4 + 1
                 l = 3*N/4 + 1
-                x(i, k, l) = 4.d0/3.d0*restricted_interface(i, k, l, 6) - &
-                             1.d0/3.d0*x(i, k, l + 1)
+                val_z(i, k, l) = val_z(i, k, l) + 4.d0/3.d0*restricted_interface(i, k, l, 6) - &
+                                 1.d0/3.d0*x(i, k, l + 1)
+                count_z(i, k, l) = count_z(i, k, l) + 1
+            end do
+        end do
+        !$OMP end parallel do
+
+        !$OMP parallel do collapse(3) private(l,k,i) schedule(static)
+        do l = N/4 + 2, 3*N/4 + 1
+            do k = N/4 + 2, 3*N/4 + 1
+                do i = N/4 + 2, 3*N/4 + 1
+                    if (count_z(i, k, l) > 0) then
+                        x(i, k, l) = val_z(i, k, l)/dble(count_z(i, k, l))
+                    end if
+                end do
             end do
         end do
         !$OMP end parallel do
@@ -373,7 +394,7 @@ contains
         implicit none(type, external)
         integer :: runs, i
         runs = 0
-        call multigrid_setup(grid)
+        call multigrid_setup()
         call copy_afac_to_multigrid
 
         do while (runs < multigrid_max_iterations)
@@ -409,6 +430,7 @@ contains
         if (THIS_IMAGE() == i - 1) then
             call pack_error()
         end if
+        sync all
         if (THIS_IMAGE() == i) then
             error_buffer_recv(:) = error_buffer[THIS_IMAGE() - 1] (:)
             call unpack_error()

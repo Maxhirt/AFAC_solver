@@ -49,11 +49,8 @@ contains
     !> Multigrid Setup
     !!
     !! Allocates the multigrid grids with the correct size and initializes them to zero.
-    !!
-    !! @param[inout] grid Allocatable Multigrid levels.
-    subroutine multigrid_setup(grid)
+    subroutine multigrid_setup()
         implicit none(type, external)
-        type(grid_level), intent(inout), allocatable :: grid(:)
         integer :: i, N_local
 
         if (.not. allocated(grid)) then
@@ -168,7 +165,9 @@ contains
         wz = 0.75d0
 
         N_fine = grid(j - 1)%N_grid
-
+        !$OMP parallel do collapse(3) &
+        !$OMP private(i,k,l,i_coarse,k_coarse,l_coarse,i_coarse_neigh,k_coarse_neigh,l_coarse_neigh) &
+        !$OMP schedule(static)
         do l = 2, N_fine + 1
             do k = 2, N_fine + 1
                 do i = 2, N_fine + 1
@@ -192,6 +191,7 @@ contains
                 end do
             end do
         end do
+        !$OMP end parallel do
     end subroutine prolongation_operator
 
     !> Calculates the residual on a multigrid level
