@@ -13,6 +13,8 @@ program main
     hloc = h/(2.d0**(THIS_IMAGE() - 1))
     domain_length = global_domain_length/(2.d0**(THIS_IMAGE() - 1))
 
+    print *, "epsilon:  ", epsilon
+
     call initial_condition()
 
     call setup_afac()

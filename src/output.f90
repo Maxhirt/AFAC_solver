@@ -22,7 +22,7 @@ contains
         write (filename, "(A,I0,A)") "global_it_", run, ".dat"
         if (this_image() == 1) then
             open (newunit=u_comb, file=filename, status="replace", action="write")
-            write (u_comb, '(A)') '# Level  Xpos           Ypos           Zpos           Numerical      Analytical     Rel_Error'
+            write (u_comb, '(A)') '# Level      Index_x       Index_y       Index_z       Xpos           Ypos           Zpos           Numerical      Analytical     Rel_Error'
             close (u_comb)
         end if
         sync all
@@ -44,7 +44,7 @@ contains
                     xpos = (i - 1)*hloc - domain_length/2.d0 - hloc/2.d0
                     ypos = (k - 1)*hloc - domain_length/2.d0 - hloc/2.d0
                     zpos = (l - 1)*hloc - domain_length/2.d0 - hloc/2.d0
-                    write (u_comb, '(I5, 2X, 6(E14.7, 2X), I2)') this_image(), xpos, ypos, zpos, x(i, k, l), &
+                    write (u_comb, '(I5, 2X, 9(E14.7, 2X), I2)') this_image(), i, k, l, xpos, ypos, zpos, x(i, k, l), &
                         ana_solution(i, k, l), relative_error(i, k, l)
 
                 end do
@@ -65,7 +65,7 @@ contains
                 xpos = (i - 1)*hloc - domain_length/2.d0 - hloc/2.d0
                 ypos = (k - 1)*hloc - domain_length/2.d0 - hloc/2.d0
                 zpos = (l - 1)*hloc - domain_length/2.d0 - hloc/2.d0
-                write (u_comb, '(I5, 2X, 6(E14.7, 2X), I2)') this_image(), xpos, ypos, zpos, x(i, k, l), &
+                write (u_comb, '(I5, 2X, 9(E14.7, 2X), I2)') this_image(), i, k, l, xpos, ypos, zpos, x(i, k, l), &
                     ana_solution(i, k, l), relative_error(i, k, l)
 
             end do

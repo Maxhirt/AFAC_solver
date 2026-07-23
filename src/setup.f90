@@ -17,7 +17,7 @@ module setup
     double precision, PARAMETER :: fourpi = 4*pi
     integer, PARAMETER :: boundary_type = 0
     double precision, PARAMETER :: G = 1.d0
-    double precision, PARAMETER :: epsilon = 1.d-10
+    double precision, PARAMETER :: epsilon = 1.d-8
 
     ! Number of grid points and domain definition
     integer, PARAMETER :: N = GRID_N
@@ -29,7 +29,7 @@ module setup
     integer, PARAMETER :: max_iterations = 40
 
     ! Constants
-    double precision, PARAMETER :: rsp_sphere = 0.25d0
+    double precision, PARAMETER :: rsp_sphere = 0.05d0
     double precision, PARAMETER :: rho_sphere = 1.d0
     double precision, PARAMETER :: rsp1 = 1.d0
     double precision, PARAMETER :: rho1 = 1.d0

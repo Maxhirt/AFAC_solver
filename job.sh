@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=fac_gravity
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=2            # 9 coarray images
+#SBATCH --ntasks-per-node=3            # 9 coarray images
 #SBATCH --cpus-per-task=40
 #SBATCH --time=00:10:00
 #SBATCH -A p70652

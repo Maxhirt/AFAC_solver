@@ -336,6 +336,7 @@ contains
                         else
                             local_l2_error = res(i, k, l)
                             c_sum = c_sum + local_l2_error**2
+
                             num_cells = num_cells + 1
                         end if
                     end do

@@ -1,4 +1,4 @@
-set(RESOLUTIONS 16 32 64 128 256 512 1024)
+set(RESOLUTIONS 16 32 64 128 256)
 
 # Declare custom target to run/manage benchmarks
 add_custom_target(run_benchmarks)
@@ -38,7 +38,7 @@ foreach(RES IN LISTS RESOLUTIONS)
 
     # 1. Generate config_<RES>.caf file for Intel Coarrays
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config_${RES}.caf"
-"-n 1 ./${TARGET_NAME}
+"-n 9 ./${TARGET_NAME}
 "
     )
 
@@ -46,10 +46,10 @@ foreach(RES IN LISTS RESOLUTIONS)
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/slurm_${RES}.sh"
 "#!/bin/bash
 #SBATCH --job-name=fac_mg_${RES}
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --nodes=3
+#SBATCH --ntasks-per-node=3
 #SBATCH --cpus-per-task=40
-#SBATCH --time=00:30:00
+#SBATCH --time=01:30:00
 #SBATCH -A p70652
 #SBATCH --output=job_${RES}_%j.out
 #SBATCH --mail-type=BEGIN,END,FAIL
