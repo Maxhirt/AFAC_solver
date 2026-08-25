@@ -32,12 +32,12 @@ module setup
     ! Constants
     double precision, PARAMETER :: rsp_sphere = 0.05d0
     double precision, PARAMETER :: rho_sphere = 1.d0
-    double precision, PARAMETER :: rsp1 = 0.05d0
+    double precision, PARAMETER :: rsp1 = 0.01d0
     double precision, PARAMETER :: rho1 = 2.0d0
-    double precision, PARAMETER :: rsp2 = 0.05d0
+    double precision, PARAMETER :: rsp2 = 0.01d0
     double precision, PARAMETER :: rho2 = 1.d0
-    double precision, PARAMETER :: offset_x1 = 0.1d0
-    double precision, PARAMETER :: offset_x2 = -0.1d0
+    double precision, PARAMETER :: offset_x1 = 0.05d0
+    double precision, PARAMETER :: offset_x2 = 0.01d0
     double precision, PARAMETER :: semi_x = 1.d0
     double precision, PARAMETER :: semi_z = 0.5d0
     double precision, PARAMETER :: r_c = 0.1d0

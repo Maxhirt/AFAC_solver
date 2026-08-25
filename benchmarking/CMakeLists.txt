@@ -38,7 +38,7 @@ foreach(RES IN LISTS RESOLUTIONS)
 
     # 1. Generate config_<RES>.caf file for Intel Coarrays
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/config_${RES}.caf"
-"-n 9 ./${TARGET_NAME}
+"-n 12 ./${TARGET_NAME}
 "
     )
 
@@ -46,7 +46,7 @@ foreach(RES IN LISTS RESOLUTIONS)
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/slurm_${RES}.sh"
 "#!/bin/bash
 #SBATCH --job-name=fac_mg_${RES}
-#SBATCH --nodes=3
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=3
 #SBATCH --cpus-per-task=40
 #SBATCH --time=01:30:00
