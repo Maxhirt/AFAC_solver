@@ -1,5 +1,5 @@
 #ifndef GRID_N
-#define GRID_N 64
+#define GRID_N 128
 #endif
 
 module setup
@@ -24,20 +24,20 @@ module setup
     integer, PARAMETER :: N = GRID_N
     integer, PARAMETER :: NSLAE = (N + 2)*(N + 2)*(N + 2)
     double precision, PARAMETER :: global_domain_length = 1.d0
-    integer, PARAMETER :: multigrid_levels = 3
-    integer, PARAMETER :: multigrid_max_iterations = 10
+    integer, PARAMETER :: multigrid_levels = 5
+    integer, PARAMETER :: multigrid_max_iterations = 5
     integer, PARAMETER :: rbgs_max_iterations = 5
     integer, PARAMETER :: max_iterations = 40
 
     ! Constants
     double precision, PARAMETER :: rsp_sphere = 0.05d0
     double precision, PARAMETER :: rho_sphere = 1.d0
-    double precision, PARAMETER :: rsp1 = 0.01d0
+    double precision, PARAMETER :: rsp1 = 0.1d0
     double precision, PARAMETER :: rho1 = 2.0d0
-    double precision, PARAMETER :: rsp2 = 0.01d0
+    double precision, PARAMETER :: rsp2 = 0.1d0
     double precision, PARAMETER :: rho2 = 1.d0
-    double precision, PARAMETER :: offset_x1 = 0.05d0
-    double precision, PARAMETER :: offset_x2 = 0.01d0
+    double precision, PARAMETER :: offset_x1 = -0.1d0
+    double precision, PARAMETER :: offset_x2 = 0.3d0
     double precision, PARAMETER :: semi_x = 1.d0
     double precision, PARAMETER :: semi_z = 0.5d0
     double precision, PARAMETER :: r_c = 0.1d0

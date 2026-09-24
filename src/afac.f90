@@ -392,26 +392,32 @@ contains
     !! @param[out] param2 Description of param2.
     subroutine multigrid_afac()
         implicit none(type, external)
-        integer :: runs, i
+        integer :: runs, i, j
         runs = 0
         call multigrid_setup()
         call copy_afac_to_multigrid
 
         do while (runs < multigrid_max_iterations)
-            call rbgs_smoother(1)
+            do i = 1, 5
+                call rbgs_smoother(1)
+            end do
             call multigrid_residual(1)
             do i = 2, multigrid_levels
                 grid(i)%x = 0.d0
                 grid(i)%err = 0.d0
                 call restriction_operator(i - 1)
-                call rbgs_smoother(i)
+                do j = 1, 5
+                    call rbgs_smoother(i)
+                end do
                 call multigrid_residual(i)
             end do
 
             do i = (multigrid_levels - 1), 1, -1
                 call prolongation_operator(i + 1)
                 call apply_multigrd_correction(i)
-                call rbgs_smoother(i)
+                do j = 1, 5
+                    call rbgs_smoother(i)
+                end do
             end do
             runs = runs + 1
         end do
