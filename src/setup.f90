@@ -12,7 +12,7 @@ module setup
               semi_z, restricted_interface, restricted_interface_buffer, coarse_cell_buffer, &
               restricted_interface_buffer_recv, error_copy, error_buffer, error_buffer_recv, relative_error, epsilon, N, &
            multigrid_max_iterations, rbgs_max_iterations, max_iterations, coarse_cell_buffer_recv, r_c, coarse_comp_x, grid_level, &
-              val_z, count_z
+              val_z, count_z, save_directory
 
     double precision, PARAMETER :: pi = 3.14159265358973238462d0
     double precision, PARAMETER :: fourpi = 4*pi
@@ -82,5 +82,7 @@ module setup
     double precision :: error_buffer_recv((N/2 + 2)*(N/2 + 2)*(N/2 + 2))
     integer :: count_z(N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1)
     double precision :: val_z(N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1)
+
+    character(len=32), PARAMETER :: save_directory = "First_test"
 
 end module setup

@@ -1,5 +1,5 @@
 module output
-    use setup, only: N, relative_error, x, ana_solution, hloc, domain_length
+    use setup, only: N, relative_error, x, ana_solution, hloc, domain_length, save_directory
 
     private
     public :: output_results_global
@@ -18,8 +18,9 @@ contains
         integer :: mid_start, mid_end, u_comb, img
         double precision :: xpos, ypos, zpos
         character(len=32) :: filename
+        character(len=32) :: save_directory
 
-        write (filename, "(A,I0,A)") "global_it_", run, ".dat"
+        write (filename, "(A,I0,A)") save_directory, "global_it_", run, ".dat"
         if (this_image() == 1) then
             open (newunit=u_comb, file=filename, status="replace", action="write")
             write (u_comb, '(A)') '# Level      Index_x       Index_y       Index_z       Xpos           Ypos           Zpos           Numerical      Analytical     Rel_Error'

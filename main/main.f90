@@ -41,6 +41,10 @@ program main
             print *, "l2_error:  ", l2_norm
         end if
         sync all
+        if (mod(num_runs, 2) == 0) then
+            call output_results_global(num_runs)
+        end if
+        sync all
         num_runs = num_runs + 1
 
     end do
