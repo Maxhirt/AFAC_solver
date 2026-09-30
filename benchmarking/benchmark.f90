@@ -31,8 +31,10 @@ program benchmark
     end do
     call system_clock(t_end)
     elapsed_seconds = real(t_end - t_start, kind=8)/t_rate
-    print '(A, I0, A, F8.4, A)', " [N = ", N, "] Execution Time: ", elapsed_seconds, " seconds"
-    open (newunit=unit_num, file="benchmark_results.csv", status="unknown", position="append")
-    write (unit_num, '(I0, ",", F12.6)') N, elapsed_seconds
-    close (unit_num)
+    if (THIS_IMAGE() == 1) then
+        print '(A, I0, A, F8.4, A)', " [N = ", N, "] Execution Time: ", elapsed_seconds, " seconds"
+        open (newunit=unit_num, file="benchmark_results.csv", status="unknown", position="append")
+        write (unit_num, '(I0, ",", F12.6)') N, elapsed_seconds
+        close (unit_num)
+    end if
 end program benchmark

@@ -1,4 +1,4 @@
-set(RESOLUTIONS 16 32 64 128 256)
+set(RESOLUTIONS 16 32 64 128 256 512)
 
 # Declare custom target to run/manage benchmarks
 add_custom_target(run_benchmarks)
@@ -49,7 +49,7 @@ foreach(RES IN LISTS RESOLUTIONS)
 #SBATCH --nodes=4
 #SBATCH --ntasks-per-node=3
 #SBATCH --cpus-per-task=40
-#SBATCH --time=01:30:00
+#SBATCH --time=05:30:00
 #SBATCH -A p70652
 #SBATCH --output=job_${RES}_%j.out
 #SBATCH --mail-type=BEGIN,END,FAIL

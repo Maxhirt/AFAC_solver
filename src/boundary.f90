@@ -67,10 +67,10 @@ contains
 
             E = sqrt(1.d0 - (semi_z/semi_x)**2)
             AA1 = (sqrt(1.d0 - E**2)/E**3)*asin(E) - (1.d0 - E**2)/E**2
-            AA3 = (2.d0/E**2) - 2.d0*(sqrt(1 - E**2)/E**3)*asin(E)
+            AA3 = (2.d0/E**2) - 2.d0*((1 - E**2)/E**3)*asin(E)
 
             if (radius**2/semi_x**2 + zpos**2/semi_z**2 <= 1.d0) then
-                boundary_value = -pi*G*rho_sphere*(semi_x**2*AA1 + semi_x**2*AA1 + &
+                boundary_value = -pi*G*rho_sphere*(semi_x**2*AA1 + semi_x**2*AA1 - &
                                                    semi_z**2*AA3 - AA1*radius**2 - AA3*zpos**2)
             else
 
@@ -78,7 +78,7 @@ contains
 
                 prom2 = 4.d0*(semi_x**2*semi_z**2 - radius**2*semi_z**2 - zpos**2*semi_x**2)
 
-                lambda = (prom1 + sqrt(max(0.d0, prom1**2 - prom2)))/2.d0
+                lambda = (prom1 + sqrt(-prom1**2 - prom2))/2.d0
 
                 I1 = pi/sqrt(semi_x**2 - semi_z**2) - &
                      2.d0/sqrt(semi_x**2 - semi_z**2)*atan(sqrt((semi_z**2 + lambda)/(semi_x**2 - semi_z**2)))

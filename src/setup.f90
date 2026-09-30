@@ -16,7 +16,7 @@ module setup
 
     double precision, PARAMETER :: pi = 3.14159265358973238462d0
     double precision, PARAMETER :: fourpi = 4*pi
-    integer, PARAMETER :: boundary_type = 1
+    integer, PARAMETER :: boundary_type = 0    ! 0 sphere, 1 binary, 2 condensed sphere, 3 ellipsoid
     double precision, PARAMETER :: G = 1.d0
     double precision, PARAMETER :: epsilon = 1.d-8
 
@@ -30,16 +30,16 @@ module setup
     integer, PARAMETER :: max_iterations = 40
 
     ! Constants
-    double precision, PARAMETER :: rsp_sphere = 0.05d0
+    double precision, PARAMETER :: rsp_sphere = 0.25d0
     double precision, PARAMETER :: rho_sphere = 1.d0
-    double precision, PARAMETER :: rsp1 = 0.1d0
+    double precision, PARAMETER :: rsp1 = 0.05d0
     double precision, PARAMETER :: rho1 = 2.0d0
-    double precision, PARAMETER :: rsp2 = 0.1d0
+    double precision, PARAMETER :: rsp2 = 0.2d0
     double precision, PARAMETER :: rho2 = 1.d0
-    double precision, PARAMETER :: offset_x1 = -0.1d0
-    double precision, PARAMETER :: offset_x2 = 0.3d0
-    double precision, PARAMETER :: semi_x = 1.d0
-    double precision, PARAMETER :: semi_z = 0.5d0
+    double precision, PARAMETER :: offset_x1 = -0.05d0
+    double precision, PARAMETER :: offset_x2 = 0.2d0
+    double precision, PARAMETER :: semi_x = 0.05d0
+    double precision, PARAMETER :: semi_z = 0.02d0
     double precision, PARAMETER :: r_c = 0.1d0
 
     ! Arrays
@@ -83,6 +83,6 @@ module setup
     integer :: count_z(N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1)
     double precision :: val_z(N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1)
 
-    character(len=32), PARAMETER :: save_directory = "First_test"
+    character(len=128), PARAMETER :: save_directory = "three_image_ellipsoid_005_002_1/"
 
 end module setup

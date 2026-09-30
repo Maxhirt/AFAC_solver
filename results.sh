@@ -9,6 +9,8 @@ fi
 
 OPTION="$1"
 
+rm -rf "${OPTION}"
+
 # Create required directories
 mkdir -p "build_${OPTION}"
 mkdir -p "${OPTION}"
@@ -18,9 +20,9 @@ cat << EOF > "job_${OPTION}.sh"
 #!/bin/bash
 #SBATCH --job-name=${OPTION}
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=2
-#SBATCH --cpus-per-task=40
-#SBATCH --time=00:10:00
+#SBATCH --ntasks-per-node=3
+#SBATCH --cpus-per-task=32
+#SBATCH --time=00:25:00
 #SBATCH -A p70652
 #SBATCH --output=job_%j.out
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -44,7 +46,7 @@ export OMP_PLACES=cores
 export MPIR_CVAR_CH4_OFI_ENABLE_RMA=0
 
 # Run the distributed-memory coarray executable
-export FOR_COARRAY_CONFIG_FILE=config.caf
+export FOR_COARRAY_CONFIG_FILE=config_${OPTION}.caf
 ./build_${OPTION}/main/AFAC_solver
 echo "finished"
 EOF
@@ -53,12 +55,13 @@ EOF
 chmod +x "job_${OPTION}.sh"
 
 # Overwrite config.caf with the updated path
-echo "-n 2 ./${OPTION}/main/AFAC_solver" > config.caf
+echo "-n 1 ./build_${OPTION}/main/AFAC_solver" > config_${OPTION}.caf
 
 # Enter build folder, run CMake & Make, then return to parent directory
 cd "build_${OPTION}" || exit 1
 FC=ifort cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j4
+make clean
+make -j8
 cd ..
 
 # Submit the generated SLURM job script

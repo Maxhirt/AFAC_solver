@@ -1,5 +1,5 @@
 module output
-    use setup, only: N, relative_error, x, ana_solution, hloc, domain_length, save_directory
+    use setup, only: N, relative_error, x, ana_solution, hloc, domain_length, save_directory, rho, res
 
     private
     public :: output_results_global
@@ -17,13 +17,12 @@ contains
         integer :: i, k, l
         integer :: mid_start, mid_end, u_comb, img
         double precision :: xpos, ypos, zpos
-        character(len=32) :: filename
-        character(len=32) :: save_directory
+        character(len=128) :: filename
 
-        write (filename, "(A,I0,A)") save_directory, "global_it_", run, ".dat"
+        write (filename, "(A,A,I0,A)") trim(save_directory), "global_it_", run, ".dat"
         if (this_image() == 1) then
-            open (newunit=u_comb, file=filename, status="replace", action="write")
-            write (u_comb, '(A)') '# Level      Index_x       Index_y       Index_z       Xpos           Ypos           Zpos           Numerical      Analytical     Rel_Error'
+            open (newunit=u_comb, file=trim(filename), status="replace", action="write")
+            write (u_comb, '(A)') '# Level      Index_x       Index_y       Index_z       Xpos           Ypos           Zpos           Numerical      Analytical     Rel_Error      Density     Residual'
             close (u_comb)
         end if
         sync all
@@ -45,8 +44,8 @@ contains
                     xpos = (i - 1)*hloc - domain_length/2.d0 - hloc/2.d0
                     ypos = (k - 1)*hloc - domain_length/2.d0 - hloc/2.d0
                     zpos = (l - 1)*hloc - domain_length/2.d0 - hloc/2.d0
-                    write (u_comb, '(I5, 2X, 9(E14.7, 2X), I2)') this_image(), i, k, l, xpos, ypos, zpos, x(i, k, l), &
-                        ana_solution(i, k, l), relative_error(i, k, l)
+                    write (u_comb, '(4(I5, 2X), 8(E14.7, 2X))') this_image(), i, k, l, xpos, ypos, zpos, x(i, k, l), &
+                        ana_solution(i, k, l), relative_error(i, k, l), rho(i, k, l), res(i, k, l)
 
                 end do
                 end do
@@ -66,8 +65,8 @@ contains
                 xpos = (i - 1)*hloc - domain_length/2.d0 - hloc/2.d0
                 ypos = (k - 1)*hloc - domain_length/2.d0 - hloc/2.d0
                 zpos = (l - 1)*hloc - domain_length/2.d0 - hloc/2.d0
-                write (u_comb, '(I5, 2X, 9(E14.7, 2X), I2)') this_image(), i, k, l, xpos, ypos, zpos, x(i, k, l), &
-                    ana_solution(i, k, l), relative_error(i, k, l)
+                write (u_comb, '(4(I5, 2X), 8(E14.7, 2X))') this_image(), i, k, l, xpos, ypos, zpos, x(i, k, l), &
+                    ana_solution(i, k, l), relative_error(i, k, l), rho(i, k, l), res(i, k, l)
 
             end do
             end do

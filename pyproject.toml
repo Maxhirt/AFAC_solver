@@ -6,7 +6,7 @@ authors = [
     {name = "Max Hirtenlehner",email = "max.hirtenlehner@student.uibk.ac.at"}
 ]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = "3.11"
 package-mode = false
 
 
@@ -21,3 +21,5 @@ dev = ["fortls (>=3.2.2,<4.0.0)", "fortitude (>=0.1.9.12,<0.2.0.0)", "fprettify 
 [tool.poetry.dependencies]
 pandas = "^3.0.3"
 matplotlib = "^3.11.1"
+scipy = "^1.15.0"
+numpy = "^2.4.0"
