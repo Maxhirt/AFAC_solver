@@ -17,6 +17,10 @@ The exact output can be examined in the src/output.f90 file.
 
 Plots of the results will be following soon. 
 
+The Benchmark results of a single image run can be found in benchmark_results.csv
+
+I will update the Benchmarks soon for multi-image runs. 
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
