@@ -15,6 +15,7 @@ Binary Spheres
 
 The exact output can be examined in the src/output.f90 file. 
 
+Plots of the results will be following soon. 
 
 ## Contributing
 
