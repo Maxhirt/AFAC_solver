@@ -4,7 +4,7 @@ Asynchronous Fast adaptive composite Grid solver for partial differential equati
 ## Implementation
 
 This is a proof of concept code it shows the working of the AFAC algorithm on a nested grid with an arbitrary number of nested levels. It calculates the gravitational potential of a given density distribution and compares them to the analytical results. 
-The results are outputted as .dat files. 
+The results are outputted as .dat files. The amount of nested levels can be changed by changing the config.caf file. 
 
 ## Results
 
