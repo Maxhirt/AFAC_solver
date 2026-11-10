@@ -24,11 +24,11 @@ contains
         end if
         sync all
         if (this_image() > 1) then
-            coarse_cell_buffer_recv(:) = coarse_cell_buffer[this_image() - 1] (:)
+            coarse_cell_buffer_recv(:) = coarse_cell_buffer(:)[this_image() - 1]
             call unpack_coarse()
         end if
         if (this_image() < num_images()) then
-            restricted_interface_buffer_recv(:) = restricted_interface_buffer[this_image() + 1] (:)
+            restricted_interface_buffer_recv(:) = restricted_interface_buffer(:)[this_image() + 1]
             call unpack_fine
         end if
         sync all

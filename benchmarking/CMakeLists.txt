@@ -1,4 +1,4 @@
-set(RESOLUTIONS 16 32 64 128 256 512)
+set(RESOLUTIONS 16 32 64 128 256)
 
 # Declare custom target to run/manage benchmarks
 add_custom_target(run_benchmarks)

@@ -438,7 +438,7 @@ contains
         end if
         sync all
         if (THIS_IMAGE() == i) then
-            error_buffer_recv(:) = error_buffer[THIS_IMAGE() - 1] (:)
+            error_buffer_recv(:) = error_buffer(:)[THIS_IMAGE() - 1]
             call unpack_error()
             call prolongate_error()
         end if

@@ -1,11 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=fac_gravity
-#SBATCH --nodes=1
+#SBATCH --nodes=3
 #SBATCH --ntasks-per-node=3            # 9 coarray images
-#SBATCH --cpus-per-task=40
+#SBATCH --cpus-per-task=16
 #SBATCH --time=00:10:00
 #SBATCH --output=job_%j.out
 #SBATCH --mail-type=BEGIN,END,FAIL    # first have to state the type of event to occur
+#SBATCH --mail-user=max.hirtenlehner@student.uibk.ac.at
 # Load compiler and MPI environment
 
 echo "job started"

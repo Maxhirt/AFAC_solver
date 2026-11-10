@@ -1,5 +1,5 @@
 #ifndef GRID_N
-#define GRID_N 128
+#define GRID_N 64
 #endif
 
 module setup
@@ -18,7 +18,7 @@ module setup
     double precision, PARAMETER :: fourpi = 4*pi
     integer, PARAMETER :: boundary_type = 0    ! 0 sphere, 1 binary, 2 condensed sphere, 3 ellipsoid
     double precision, PARAMETER :: G = 1.d0
-    double precision, PARAMETER :: epsilon = 1.d-8
+    double precision, PARAMETER :: epsilon = 1.d-6
 
     ! Number of grid points and domain definition
     integer, PARAMETER :: N = GRID_N
@@ -27,7 +27,7 @@ module setup
     integer, PARAMETER :: multigrid_levels = 5
     integer, PARAMETER :: multigrid_max_iterations = 5
     integer, PARAMETER :: rbgs_max_iterations = 5
-    integer, PARAMETER :: max_iterations = 40
+    integer, PARAMETER :: max_iterations = 25
 
     ! Constants
     double precision, PARAMETER :: rsp_sphere = 0.25d0
@@ -83,6 +83,6 @@ module setup
     integer :: count_z(N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1)
     double precision :: val_z(N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1)
 
-    character(len=128), PARAMETER :: save_directory = "three_image_ellipsoid_005_002_1/"
+    character(len=128), PARAMETER :: save_directory = "./"
 
 end module setup

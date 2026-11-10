@@ -54,12 +54,10 @@ contains
         integer :: i, N_local
 
         if (.not. allocated(grid)) then
-            print *, "Allocating multigrid grid levels"
             allocate (grid(multigrid_levels))
         end if
 
         do i = 1, multigrid_levels
-            print *, "Allocating grid level ", i
             if (.not. allocated(grid(i)%res)) then
                 N_local = N/(2**(i - 1))
                 grid(i)%N_grid = N_local
