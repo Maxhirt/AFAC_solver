@@ -83,6 +83,6 @@ module setup
     integer :: count_z(N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1)
     double precision :: val_z(N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1, N/4 + 2:3*N/4 + 1)
 
-    character(len=128), PARAMETER :: save_directory = "Test_results/"
+    character(len=128), PARAMETER :: save_directory = "/home/mh44676/AFAC_solver/Test_results/"
 
 end module setup
