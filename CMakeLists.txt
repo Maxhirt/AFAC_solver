@@ -8,12 +8,6 @@ endif()
 enable_testing()
 
 include(FetchContent)
-FetchContent_Declare(
-  test_drive
-  GIT_REPOSITORY https://github.com/fortran-lang/test-drive.git
-  GIT_TAG v0.6.1
-)
-FetchContent_MakeAvailable(test_drive)
 
 FetchContent_Declare(
   forbenchmark
@@ -21,14 +15,17 @@ FetchContent_Declare(
   GIT_TAG v0.2.0
 )
 FetchContent_MakeAvailable(forbenchmark)
+
+
+
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 set(TEST_DIR ${CMAKE_SOURCE_DIR}/tests)
 set(MAIN_DIR ${CMAKE_SOURCE_DIR}/main)
 set(BENCHMARK_DIR ${CMAKE_SOURCE_DIR}/benchmarking)
 
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp -cpp -O3 -traceback  -warn all -xHost -qopenmp -coarray=distributed -mcmodel=medium -shared-intel")
-set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -fpp -cpp -traceback -warn all -xHost -qopenmp -coarray=distributed -mcmodel=medium -shared-intel")
-set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -fpp -cpp -traceback -warn all -xHost -qopenmp -coarray=distributed -mcmodel=medium -shared-intel")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp -cpp -O3 -msse2 -mavx2 -traceback -warn all -qopenmp -coarray=shared -mcmodel=medium -fpe0")
+set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -msse2 -mavx2 -fpp -cpp -traceback -warn all -qopenmp -coarray=shared -mcmodel=medium -fpe0")
+set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -msse2 -mavx2 -fpp -cpp -traceback -warn all -qopenmp -coarray=shared -mcmodel=medium")
 
 add_subdirectory(src)
 add_subdirectory(tests)

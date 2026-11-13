@@ -1,1 +1,1 @@
--n 9 ./build/main/AFAC_solver
+-n 9 -genvall /home/mh44676/AFAC_solver/build/main/AFAC_solver
