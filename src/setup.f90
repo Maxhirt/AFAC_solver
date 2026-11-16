@@ -24,9 +24,9 @@ module setup
     integer, PARAMETER :: N = GRID_N
     integer, PARAMETER :: NSLAE = (N + 2)*(N + 2)*(N + 2)
     double precision, PARAMETER :: global_domain_length = 1.d0
-    integer, PARAMETER :: multigrid_levels = 5
-    integer, PARAMETER :: multigrid_max_iterations = 5
-    integer, PARAMETER :: rbgs_max_iterations = 5
+    integer, PARAMETER :: multigrid_levels = 3
+    integer, PARAMETER :: multigrid_max_iterations = 3
+    integer, PARAMETER :: rbgs_max_iterations = 10
     integer, PARAMETER :: max_iterations = 25
 
     ! Constants

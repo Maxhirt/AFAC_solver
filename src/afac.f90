@@ -398,7 +398,7 @@ contains
         call copy_afac_to_multigrid
 
         do while (runs < multigrid_max_iterations)
-            do i = 1, 5
+            do i = 1, 3
                 call rbgs_smoother(1)
             end do
             call multigrid_residual(1)
@@ -406,7 +406,7 @@ contains
                 grid(i)%x = 0.d0
                 grid(i)%err = 0.d0
                 call restriction_operator(i - 1)
-                do j = 1, 5
+                do j = 1, 3
                     call rbgs_smoother(i)
                 end do
                 call multigrid_residual(i)
@@ -415,7 +415,7 @@ contains
             do i = (multigrid_levels - 1), 1, -1
                 call prolongation_operator(i + 1)
                 call apply_multigrd_correction(i)
-                do j = 1, 5
+                do j = 1,3
                     call rbgs_smoother(i)
                 end do
             end do
@@ -435,14 +435,21 @@ contains
         do i = 2, num_images()
         if (THIS_IMAGE() == i - 1) then
             call pack_error()
+            sync images(i)
+            else if (this_image() == i) then
+            sync images(i-1)
         end if
-        sync all
+
         if (THIS_IMAGE() == i) then
             error_buffer_recv(:) = error_buffer(:)[THIS_IMAGE() - 1]
             call unpack_error()
             call prolongate_error()
         end if
-        sync all
+        if (this_image() == i - 1) then
+            sync images(i)
+        else if (this_image() == i) then
+            sync images(i - 1)
+        end if
         end do
 
         call error_reconciliation()

@@ -14,15 +14,21 @@ contains
     !!
     subroutine interface_exchange
         implicit none(type, external)
+        integer :: neighbors(2), n
 
+        n = 0
         if (this_image() > 1) then
             call restrict_layer
             call pack_fine
+            n = n + 1
+            neighbors(n) = this_image() - 1
         end if
         if (THIS_IMAGE() < num_images()) then
             call pack_coarse
+            n = n + 1
+            neighbors(n) = this_image() + 1
         end if
-        sync all
+        if (n > 0) sync images(neighbors(1:n))
         if (this_image() > 1) then
             coarse_cell_buffer_recv(:) = coarse_cell_buffer(:)[this_image() - 1]
             call unpack_coarse()
@@ -31,7 +37,7 @@ contains
             restricted_interface_buffer_recv(:) = restricted_interface_buffer(:)[this_image() + 1]
             call unpack_fine
         end if
-        sync all
+        if (n > 0) sync images(neighbors(1:n))
 
     end subroutine interface_exchange
 

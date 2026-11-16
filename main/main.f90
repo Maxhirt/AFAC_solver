@@ -8,25 +8,25 @@ program main
     integer :: num_runs
     double precision :: l2_norm, old_l2_norm
     double precision :: h
-    print*, "starting simulation"
+    integer(8) :: start_count, end_count, count_rate
+    real :: elapsed_time
     flush(6)
     h = global_domain_length/N
     hloc = h/(2.d0**(THIS_IMAGE() - 1))
     domain_length = global_domain_length/(2.d0**(THIS_IMAGE() - 1))
+    call system_clock(count_rate=count_rate)
 
 
     call initial_condition()
-
+    call system_clock(count=start_count)
     call setup_afac()
     sync all
     call residual()
     call l2_norm_residual(l2_norm)
     num_runs = 0
     old_l2_norm = 20*l2_norm
-    print *, "intial l2_error: ", l2_norm
-    print *, "old l2 norm:", old_l2_norm
+
     do while ((abs(l2_norm-old_l2_norm) > epsilon) .and. (num_runs < max_iterations))
-        print *, "DEBUG: Entering solver loop, image: ", this_image()
         flush(6)
         call multigrid_afac
         sync all
@@ -38,11 +38,12 @@ program main
         call l2_norm_residual(l2_norm)
         sync all
         num_runs = num_runs + 1
-        print *, "num_runs: ", num_runs
 
     end do
     sync all
-
+    call system_clock(count=end_count)
+    elapsed_time = real(end_count - start_count) / real(count_rate)
+    print *, 'Execution time: ', elapsed_time, ' seconds'
     call analytical_solution_calculator()
     call output_results_global(num_runs)
 
