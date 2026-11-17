@@ -69,3 +69,6 @@ Testing/
 .cache/
 .zed/
 job.sh
+*.dat
+/.idea
+.idea/

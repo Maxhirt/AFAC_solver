@@ -398,15 +398,13 @@ contains
         call copy_afac_to_multigrid
 
         do while (runs < multigrid_max_iterations)
-            do i = 1, 3
+            do i = 1, 5
                 call rbgs_smoother(1)
             end do
             call multigrid_residual(1)
             do i = 2, multigrid_levels
-                grid(i)%x = 0.d0
-                grid(i)%err = 0.d0
                 call restriction_operator(i - 1)
-                do j = 1, 3
+                do j = 1, 5
                     call rbgs_smoother(i)
                 end do
                 call multigrid_residual(i)
@@ -415,7 +413,7 @@ contains
             do i = (multigrid_levels - 1), 1, -1
                 call prolongation_operator(i + 1)
                 call apply_multigrd_correction(i)
-                do j = 1,3
+                do j = 1,5
                     call rbgs_smoother(i)
                 end do
             end do

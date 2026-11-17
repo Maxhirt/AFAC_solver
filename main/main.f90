@@ -44,6 +44,8 @@ program main
     call system_clock(count=end_count)
     elapsed_time = real(end_count - start_count) / real(count_rate)
     print *, 'Execution time: ', elapsed_time, ' seconds'
+    print *, "Number of runs: ", num_runs
+    print*, 'l2_error: ', l2_norm
     call analytical_solution_calculator()
     call output_results_global(num_runs)
 

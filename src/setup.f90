@@ -27,7 +27,7 @@ module setup
     integer, PARAMETER :: multigrid_levels = 3
     integer, PARAMETER :: multigrid_max_iterations = 3
     integer, PARAMETER :: rbgs_max_iterations = 10
-    integer, PARAMETER :: max_iterations = 25
+    integer, PARAMETER :: max_iterations = 30
 
     ! Constants
     double precision, PARAMETER :: rsp_sphere = 0.25d0
