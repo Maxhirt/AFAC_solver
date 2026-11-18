@@ -23,9 +23,9 @@ set(TEST_DIR ${CMAKE_SOURCE_DIR}/tests)
 set(MAIN_DIR ${CMAKE_SOURCE_DIR}/main)
 set(BENCHMARK_DIR ${CMAKE_SOURCE_DIR}/benchmarking)
 
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp -cpp -O3 -msse2 -mavx2 -traceback -warn all -qopenmp -coarray=distributed -mcmodel=medium -fpe0")
-set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -msse2 -mavx2 -fpp -cpp -traceback -warn all -qopenmp -coarray=distributed -mcmodel=medium -fpe0")
-set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -msse2 -mavx2 -fpp -cpp -traceback -warn all -qopenmp -coarray=distributed -mcmodel=medium")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel -fpp -cpp -O3 -msse2 -mavx2 -traceback -warn all -qopenmp -coarray=distributed  -fpe0")
+set(CMAKE_Fortran_FLAGS_RELEASE "-static-intel -O3 -msse2 -mavx2 -fpp -cpp -traceback -warn all -qopenmp -coarray=distributed  -fpe0 ")
+set(CMAKE_Fortran_FLAGS_DEBUG "-static-intel -O0 -g -msse2 -mavx2 -fpp -cpp -traceback -warn all -qopenmp -coarray=distributed  ")
 
 add_subdirectory(src)
 add_subdirectory(tests)
