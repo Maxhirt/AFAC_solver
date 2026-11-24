@@ -10,6 +10,7 @@ program main
     double precision :: h
     integer(8) :: start_count, end_count, count_rate
     real :: elapsed_time
+    print*, "Start simulataion"
     flush(6)
     h = global_domain_length/N
     hloc = h/(2.d0**(THIS_IMAGE() - 1))
@@ -20,7 +21,10 @@ program main
     call initial_condition()
     call system_clock(count=start_count)
     call setup_afac()
+    print *, "First sync all"
     sync all
+    print *, "after First sync all"
+
     call residual()
     call l2_norm_residual(l2_norm)
     num_runs = 0
